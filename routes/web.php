@@ -6,6 +6,7 @@ use App\Http\Controllers\CourierController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ManagerController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -51,6 +52,9 @@ Route::post('/manager/table/select',[ManagerController::class,'viewTable'])->nam
 
 //Courier
 Route::get('/courier/home',[CourierController::class,'courierHome'])->name('courier.home');
-//Route::get('/courier/account/{name}',[CustomerController::class,'courierName'])->name('courier.name');
 Route::get('/courier/order',[CourierController::class,'orderView'])->name('courier.order');
 Route::get('/courier/acceptedOrder',[CourierController::class,'AcceptedOrderView'])->name('courier.AcceptedOrder');
+Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name('order.accept');
+Route::get('/courier/deliverd/{order_id}',[CourierController::class,'deliveredOrder'])->name('order.deliverd');
+
+Route::get('/mail',[CourierController::class,'sendMail']);

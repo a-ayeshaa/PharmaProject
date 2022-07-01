@@ -17,7 +17,10 @@
         <td>{{$order->customer_id}}</td>
         <td>{{$order->order_status}}</td>
         <td>{{$order->delivery_time}}</td>
-        <td><a href="">Delete</a></td>
+        @if ($order->order_status=='pending')
+        <td><a href="{{route('order.accept',['order_id'=>$order->order_id])}}">Accept</a></td>
+        @endif
+
     </tr>
     @endforeach
 

@@ -51,11 +51,6 @@ class CustomerController extends Controller
                                     'u_email'=>$req->email,
                                     'u_pass'=>$req->password]
                                 );
-            $user=users::find($u_id);
-            $user->customer()->updateExistingPivot($u_id, [
-                                    'customer_name'=>$req->name,
-                                    'customer_email'=>$req->email,
-                                ]);
             $u_id=session()->get('logged.customer');
             return redirect()->route('customer.account');
         }
