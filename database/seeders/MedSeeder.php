@@ -17,16 +17,45 @@ class MedSeeder extends Seeder
     public function run()
     {
         //
-        for ($i=40; $i<50; $i++)
+        // for ($i=1; $i<10; $i++)
+        // {
+        //     DB::table('medicine')->insert([
+        //         'med_name' => 'Omidon'.$i,
+        //         'price_perunit' =>rand(5,10),
+        //         'manufacturingDate'=>date("Y/m/d"),
+        //         'expiryDate'=>date("Y/m/d"),
+        //         'vendor_id'=>$i,
+        //         'vendor_name'=>'Khondu'.$i,
+        //         'contract_id'=>rand(0,5),
+        //         'Stock'=>rand(10,50)
+        //     ]);
+        // }
+
+        // for ($i=10; $i<21; $i++)
+        // {
+        //     DB::table('medicine')->insert([
+        //         'med_name' => 'Napa'.$i,
+        //         'price_perunit' =>rand(5,10),
+        //         'manufacturingDate'=>date("Y/m/d"),
+        //         'expiryDate'=>date("Y/m/d"),
+        //         'vendor_id'=>$i,
+        //         'vendor_name'=>'Khondu'.$i,
+        //         'contract_id'=>rand(0,5),
+        //         'Stock'=>rand(10,50)
+        //     ]);
+        // }
+
+        for ($i=21; $i<31; $i++)
         {
             DB::table('medicine')->insert([
-                'med_name' => 'Omidon'.$i,
+                'med_name' => 'Paracetemol'.$i,
                 'price_perunit' =>rand(5,10),
                 'manufacturingDate'=>date("Y/m/d"),
                 'expiryDate'=>date("Y/m/d"),
                 'vendor_id'=>$i,
                 'vendor_name'=>'Khondu'.$i,
-                'contract_id'=>rand(0,5)
+                'contract_id'=>rand(0,5),
+                'Stock'=>rand(10,50)
             ]);
         }
     }

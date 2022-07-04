@@ -14,6 +14,8 @@
         <input type="submit" name="submit" value="SEND">
     </form>
 </fieldset>
+<br>
+{{Session::get('emailsent')}}
 </center>
-   {{Session::get('emailsent')}}
+   
 @endsection

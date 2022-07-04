@@ -14,7 +14,7 @@
             {{ $message}}<br>
         @enderror
         <br>
-        Email: <input type="email" name="email" placeholder="{{$customer->customer_email}}" value=" {{$customer->customer_email}} ">
+        Email: <input type="email" name="email" placeholder="{{$customer->customer_email}}" value=" {{$customer->customer_email}} " readonly>
         <br>
         @error('email')
             {{ $message}}<br>

@@ -9,7 +9,7 @@
             {{ $message}}<br>
         @enderror
         <br>
-        Email : <input type="email" name="email" placeholder="Email" value="{{old('email')}}">
+        Email : <input type="email" name="email" placeholder="Email" value="{{old('email')}}" >
         <br>
         @error('email')
             {{ $message}}<br>

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('total_price');
             $table->dateTime('accepted_time')->nullable();
             $table->dateTime('delivery_time')->nullable();
-            $table->string('contract_status')->defalut('Pending');
+            $table->string('contract_status')->default('Pending');
         });
     }
 

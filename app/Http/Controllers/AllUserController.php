@@ -46,10 +46,14 @@ class AllUserController extends Controller
 
         $this->validate($req,
         [
-            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
-            // "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-            // "confirmPassword"=>"required|same:password",
-            // "email"=>"required"
+            "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+            "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
+            "confirmPassword"=>"required|same:password",
+            "email"=>"required|unique:users,u_email"
+        ],
+        [
+            "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
+
         ]);
 
         $user= new users();

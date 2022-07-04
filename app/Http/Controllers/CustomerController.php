@@ -50,10 +50,14 @@ class CustomerController extends Controller
         $u_id=$req->u_id;
         $this->validate($req,
         [
-            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
-            // "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-            // "confirmPassword"=>"required|same:password",
-            // "email"=>"required"
+            "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+            "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
+            "confirmPassword"=>"required|same:password",
+            "profilepic"=>"mimes:jpg,png,jpeg"
+        ],
+        [
+            "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
+
         ]);
         
         if ($req->hasFile('profilepic'))
@@ -64,14 +68,12 @@ class CustomerController extends Controller
             users::where('u_id',$u_id)
                         ->update(
                             ['u_name'=>$req->name,
-                            'u_email'=>$req->email,
                             'u_pass'=>$req->password
                             ]
                         );
             customer::where('customer_id',$req->customer_id)
                         ->update(
                             ['customer_name'=>$req->name,
-                            'customer_email'=>$req->email,
                             'img'=>$imgname
                             ]
                         );
@@ -128,11 +130,12 @@ class CustomerController extends Controller
         {
             $this->validate($req,
             [
-                'quantity'=> 'required|numeric|gt:0'
+                'quantity'=> 'required|numeric|max:'.$req->Stock.'|gt:0'
             ],
             [
                 'quantity.required'=>'Enter a quantity first',
-                'quantity.min'=>'Minimum of order quantity=1 is required'
+                'quantity.gt'=>'Minimum of order quantity=1 is required',
+                'quantity.max'=>'Quantity must be greater than stock'
             ]);
 
             //find cart_id
@@ -156,6 +159,8 @@ class CustomerController extends Controller
             $cart->quantity=$req->quantity;
             $cart->total=$req->quantity*$med->price_perUnit;
             $cart->save();
+
+            medicine::where('med_id',$req->med_id)->update(['Stock'=>$req->Stock-$req->quantity]);
             $subtotal=session()->get('subtotal')+$req->quantity*$med->price_perUnit;
             session()->put('subtotal',$subtotal);
             $meds=medicine::paginate(10);
@@ -238,6 +243,9 @@ class CustomerController extends Controller
     function deleteItem($item_id)
     {
         $total=carts::where('item_id',$item_id)->first();
+        $info=medicine::where('med_id',$total->med_id)->first();
+        // return $info;
+        medicine::where('med_id',$total->med_id)->update(['Stock'=>$info->Stock+$total->quantity]);
         carts::where('item_id',$item_id)->delete();
         $subtotal=session()->get('subtotal')-$total->total;
         session()->put('subtotal',$subtotal);
@@ -312,5 +320,7 @@ class CustomerController extends Controller
     {
         mail::to('ayesha.akhtar.1999@gmail.com')->send(new sendComplain("Complain from Customer#".$req->customer_id,$req->customer_id,
                                                                                $req->msg));
+        session()->flash('emailsent','EMAIL SENT SUCCESSFULLY');
+        return back();                                                                      
     }
 }
