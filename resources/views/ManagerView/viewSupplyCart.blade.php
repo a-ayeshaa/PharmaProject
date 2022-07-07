@@ -26,6 +26,7 @@
         </tr>
         @endforeach
     </table><br><br><br><br>
+    {{$data->links()}}
     Grand Total = Tk. {{$total}} <br><br>
     <form action="" method="post">
         {{ csrf_field() }}

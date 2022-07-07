@@ -20,5 +20,6 @@
         @endforeach
 
     </table>
+    {{$data->links()}}
 </body>
 @endsection
