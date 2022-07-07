@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Mail\orderAccepted;
 use App\Models\courier;
+use App\Models\customer;
 use App\Models\order;
+use App\Models\users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use PDO;
+use Carbon\Carbon;
+
 
 class CourierController extends Controller
 {
@@ -31,37 +35,79 @@ class CourierController extends Controller
     }
 
     public function acceptOrder($order_id){
+        $dateNtime=Carbon::now();
         $modified = order::where('order_id',$order_id)
         ->update(
             [
-                'order_status'=>'accepted'
+                'order_status'=>'accepted',
+                'accepted_time'=>$dateNtime
             ]
             );
-        $order=order::where('order_id',$order_id)->first();
-        
-
-        return redirect()->route('courier.mail',['order_id'=>$order_id])->with('order',$order);
+        return redirect()->route('courier.mail',['order_id'=>$order_id]);
     }
 
     public function deliveredOrder($order_id){
+        $dateNtime=Carbon::now();
         $modified = order::where('order_id',$order_id)
         ->update(
             [
-                'order_status'=>'deliverd'
+                'order_status'=>'delivered',
+                'delivery_time'=>$dateNtime,
             ]
         );
+        //$order=order::where('order_id',$order_id);
+        $u_id=session()->get('logged.courier');
+        $courier=courier::where('u_id',$u_id)->first();
+        $modified1=courier::where('u_id',$u_id)
+        // ->increment('due_delivery_fee',15);
+        ->update(
+            [
+                'due_delivery_fee'=>$courier->due_delivery_fee+15
+            ]
+            );
         return redirect()->route('courier.AcceptedOrder');
     }
 
     public function sendMail($order_id){
-        Mail::to('fake@mail.com')->send(new orderAccepted($order_id));
+        $order=order::where('order_id',$order_id)->first();
+        $customer=customer::where('customer_id',$order->customer_id)->first();
+        //Mail::to($customer->customer_email)->send(new orderAccepted($order));
+        Mail::to('tahmidislam73@gmail.com')->send(new orderAccepted($order));
         return redirect()->route('courier.order');
     }
 
     public function courierProfile(){
         $u_id=session()->get('logged.courier');
         $courier=courier::where('u_id',$u_id)->first();
-        return view('CourierView.profileView')->with('courier',$courier);
+        return view('CourierView.profileView',['id',$u_id])->with('courier',$courier);
+    }
+
+    public function courierProfileEdit(Request $req,$u_id)
+    {
+        $name=$req->name;
+        $u_id=$req->u_id;
+        $this->validate($req,
+        [
+            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+             "password"=>"required", //a|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
+             "confirmPassword"=>"required|same:password",
+            // "email"=>"required"
+        ]);
+        users::where('u_id',$u_id)
+                    ->update(
+                        ['u_name'=>$req->name,
+                        'u_email'=>$req->email,
+                        'u_pass'=>$req->password]
+                    );
+        courier::where('courier_id',$req->courier_id)
+        ->update(
+            ['courier_name'=>$req->name,
+            'courier_email'=>$req->email
+            ]
+        );
+
+        session()->put('name',$name);
+        return redirect()->route('courier.profile',['id'=>$u_id]);
     }
 
 }

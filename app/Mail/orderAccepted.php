@@ -30,6 +30,6 @@ class orderAccepted extends Mailable
      */
     public function build()
     {
-        return $this->view('CourierView.AcceptedOrder');
+        return $this->view('CourierView.AcceptedOrder')->with('order',$this->order);
     }
 }
