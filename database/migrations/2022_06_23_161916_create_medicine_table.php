@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id('med_id');
             $table->string('med_name');
             $table->integer('price_perUnit');
+            $table->integer('Stock');
             $table->date('manufacturingDate');
             $table->date('expiryDate');
             $table->integer('vendor_id');

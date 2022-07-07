@@ -19,5 +19,6 @@
         @endforeach
 
     </table>
+    {{$Val->links()}}
 </body>
 @endsection

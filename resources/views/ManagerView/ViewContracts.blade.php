@@ -8,9 +8,9 @@
             <th>Contract Status</th>
             <th>Medicine Name</th>
         </tr>
-        @foreach ($data as $it)
+        {{-- @foreach ($data as $it)
             <tr>
-                <td>{{$it->contract_id}}</td>
+                <td>{{$it->contract_id->unique()}}</td>
                 <td>{{$it->vendor_id}}</td>
                 <td>{{$it->contract_status}}</td>
                 <td>
@@ -28,7 +28,21 @@
                     <td></td>
                 @endif
             </tr>
-        @endforeach
+        @endforeach --}}
+        @foreach($data as $it)
+            <tr>
+                <td>{{$it->contract_id}}</td>
+                <td>{{$it->vendor_id}}</td>
+                <td>{{$it->contract_status}}</td>
+                <td>{{$it->med_name}}</td>
+                <td><a href="{{route('contract.info',['id'=>$it->contract_id])}}">Details</td> 
+                    @if ($it->contract_status=="Accepted" || $it->contract_status=="Pending")
+                        <td><a href="{{route('contract.delete',['id'=>$it->contract_id])}}">Cancel</td>
+                    @else
+                        <td></td>
+                    @endif
+            </tr>
+        @endforeach   
         {{-- @for ($i = 0; $i < count($data)-1; $i++)
             <tr>
                 <td>{{$data[$i]->contract_id}}</td>
@@ -52,5 +66,6 @@
             </tr>  
         @endfor --}}
     </table>
+    {{$data->links()}}
 </body>
 @endsection

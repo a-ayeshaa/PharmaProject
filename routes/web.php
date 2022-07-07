@@ -86,6 +86,8 @@ Route::get('/manager/table/manager',[ManagerController::class,'viewManager'])->n
 //User Table Functions
 Route::get('/manager/table/info/{id}',[ManagerController::class, 'userInfo'])->name('user.info')->middleware('managerAuth');
 Route::get('/manager/table/info/delete/{id}',[ManagerController::class, 'userDelete'])->name('user.delete')->middleware('managerAuth');
+// View Query
+Route::get('/manager/table/query',[ManagerController::class,'viewQuery'])->name('manager.tableViewQuery')->middleware('managerAuth');
 //Medicine Table View And Function
 Route::get('/manager/table/medicine',[ManagerController::class,'viewMed'])->name('manager.tableMedicine')->middleware('managerAuth');
 Route::get('/manager/table/info/med/{id}',[ManagerController::class, 'medInfo'])->name('med.info')->middleware('managerAuth');
@@ -114,6 +116,22 @@ Route::post('/manager/profile',[ManagerController::class,'editProfile'])->name('
 //Edit Profile
 Route::get('/manager/profile/edit',[ManagerController::class,'viewEdit'])->name('manager.editPage')->middleware('managerAuth');
 Route::post('/manager/profile/edit',[ManagerController::class,'confirmEdit'])->name('manager.editProfile')->middleware('managerAuth');
+//Query accept
+Route::get('/manager/table/query/accept/{id}',[ManagerController::class, 'queryAcc'])->name('query.accept')->middleware('managerAuth');
+//Query reject
+Route::get('/manager/table/query/reject/{id}',[ManagerController::class, 'queryDec'])->name('query.deny')->middleware('managerAuth');
+//Search method
+//Route::post('/manager/home',[ManagerController::class,'search'])->name('manager.search')->middleware('managerAuth');
+//search in user
+Route::get('/manager/search/user',[ManagerController::class, 'searchUser'])->name('search.user')->middleware('managerAuth');
+//search in medicine
+Route::get('/manager/search/Medicine',[ManagerController::class, 'searchMedicine'])->name('search.medicine')->middleware('managerAuth');
+//search in contract
+Route::get('/manager/search/contract',[ManagerController::class, 'searchContract'])->name('search.contract')->middleware('managerAuth');
+//search in order
+Route::get('/manager/search/order',[ManagerController::class, 'searchOrder'])->name('search.order')->middleware('managerAuth');
+//search in supply
+Route::get('/manager/search/supply',[ManagerController::class, 'searchSupply'])->name('search.supply')->middleware('managerAuth');
 
 
 //vendor****************************************************************************************************************************************

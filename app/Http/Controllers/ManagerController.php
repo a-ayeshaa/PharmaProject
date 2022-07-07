@@ -15,6 +15,7 @@ use App\Models\order;
 use App\Models\contract;
 use App\Models\supply;
 use App\Models\supply_cart;
+use App\Models\orders_cart;
 
 class ManagerController extends Controller
 {
@@ -54,6 +55,46 @@ class ManagerController extends Controller
         elseif($req->action=='Go to Cart')
         {
             return redirect()->route("manager.tableSupplyOrder");
+        }
+        else if($req->action=='View Query')
+        {
+            return redirect()->route("manager.tableViewQuery");
+        }
+        else if($req->action=='Search')
+        {
+            //return redirect()->route('manager.search');
+            $this->validate($req,
+            [
+                'searchBar' => 'required'
+            ],
+            [
+                'searchBar.required' => 'Please enter id'
+            ]);
+
+            session()->put('searchID',$req->searchBar);
+            //return session()->get('searchID');
+
+            if($req->search=="user")
+            {
+                return redirect()->route('search.user');
+            }
+            else if($req->search=="medicine")
+            {
+                return redirect()->route('search.medicine');
+            }
+            else if($req->search=="Contract")
+            {
+                return redirect()->route('search.contract');
+            }
+            else if($req->search=="order")
+            {
+                // session()->put('search')
+                return redirect()->route('search.order');
+            }
+            else if($req->search=="supply")
+            {
+                return redirect()->route('search.supply');
+            }
         }
 
     } 
@@ -189,6 +230,19 @@ class ManagerController extends Controller
     public function viewContract() //view contract table
     {
         $val=contract::paginate(10);
+        for ($i = count($val)-1; $i >=1; $i--)
+        {
+            for ($j = $i-1; $j >= 0; $j--)
+            {
+                if ($val[$i]->contract_id==$val[$j]->contract_id)
+                {
+                    $val[$j]->med_name=$val[$j]->med_name.",".$val[$i]->med_name;
+                    unset($val[$i]);
+                    $i--;
+                }
+            }
+        }
+        //return $val;
         return view("ManagerView.ViewContracts")->with('data',$val);
     }
 
@@ -370,15 +424,14 @@ class ManagerController extends Controller
         //$val=session()->get('manager.password');
         $this->validate($req,
         [
-            'password' => "required",
-            'newPassword' => "required",
-            'confirmPassword' => "required|same:newPassword"
+            // 'newPassword' => "",
+            'confirmPassword' => "same:newPassword"
         ],
         [
-            'password.required' => "Please enter current password!",
+            //'password.required' => "Please enter current password!",
             //'password.same' => "Entered password does not match current password!",
-            'newPassword.required' => "Please enter new password!",
-            'confirmPassword.required' => "Please confirm new password!",
+            //'newPassword.required' => "Please enter new password!",
+            //'confirmPassword.required' => "Please confirm new password!",
             'confirmPassword.same' => "The new password does not match!"
         ]);
 
@@ -386,6 +439,7 @@ class ManagerController extends Controller
         {
             $img = session()->get('logged.manager').".jpg";
             $req->file('propics')->storeAs('public/propics',$img);
+            if($req->pass==null )
             
             manager::where('manager_id',session()->get('manager.id'))
                         ->update(
@@ -401,6 +455,72 @@ class ManagerController extends Controller
             );
         }
         return redirect()->route('manager.profile');
+    }
+
+    //view query table
+
+    public function viewQuery()
+    {
+        $val=orders_cart::paginate(10);
+        return view("ManagerView.ViewQuery")->with('data',$val);
+    }
+
+    //accept query
+
+    public function queryAcc($id)
+    {
+        orders_cart::where('id',$id)
+        ->update(['return_status'=>'accepted']);
+        return back();
+    }
+
+    //reject query
+
+    public function queryDec($id)
+    {
+        orders_cart::where('id',$id)
+        ->update(['return_status'=>'declined']);
+        return back();
+    }
+
+    //search user
+
+    public function searchUser()
+    {
+        $val=users::where('u_id',session()->get('searchID'))->paginate(5);
+        return view("ManagerView.ViewTable")->with('data',$val);
+    }
+
+    //search medicine
+
+    public function searchMedicine()
+    {
+        $val=medicine::where('med_id',session()->get('searchID'))->paginate(5);
+        return view("ManagerView.ViewMed")->with('data',$val);
+    }
+
+    //search contract
+
+    public function searchContract()
+    {
+        $val=contract::where('contract_id',session()->get('searchID'))->paginate(5);
+        return view("ManagerView.ViewContracts")->with('data',$val);
+    }
+    
+    //search order
+
+    public function searchOrder()
+    {
+        $val=order::where('order_id',session()->get('searchID'))->paginate(5);
+        return view("ManagerView.ViewOrders")->with('data',$val);
+    }
+    
+    //search supply
+
+    public function searchSupply()
+    {
+        $val=supply::where('supply_id',session()->get('searchID'))->paginate(5);
+        return view("ManagerView.ViewSupply")->with('data',$val);
     }
 
 }
