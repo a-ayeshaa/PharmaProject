@@ -11,12 +11,14 @@
             <button type="button" onclick="window.location='{{route('vendor.market')}}'">Market</button>
         
             <button type="button" onclick="window.location='{{route('vendor.contracts')}}'">Contracts</button>
-
+            <p align=Right><button type="button" onclick="window.location='{{route('logout')}}'">Logout</button></p>
+            
         </h3>
+       
     </head>
-    <body>
+    <body bgcolor="#CCCCFF">
         @yield('content')
     </body>
     <br> <br> <br>
-    <a href="{{route('logout')}}">LOGOUT</a>
+    
 </html>

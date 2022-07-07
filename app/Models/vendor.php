@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class vendor extends Model
 {
     use HasFactory;
@@ -13,7 +14,7 @@ class vendor extends Model
 
     public function supply()
     {
-        return $this->hasMany(vendor::class,'vendor_id','vendor_id');
+        return $this->hasMany(supply::class,'vendor_id','vendor_id');
     }
 
     public function contract()

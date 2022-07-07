@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id('vendor_id');
             $table->integer('u_id');
             $table->string('vendor_name');
-            //$table->string('vendor_pass');
+            $table->float('account')->default(0);
             $table->string('vendor_email')->unique();
             $table->timestamps();
         });

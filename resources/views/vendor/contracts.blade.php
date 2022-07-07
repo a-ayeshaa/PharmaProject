@@ -1,22 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    @extends('vendor.layouts.toplayout')
-    @section('content')
-        
-    
-    
-    
-    
-    
-    @endsection 
+@extends('vendor.layouts.toplayout')
+@section('content')
+    <center><h2><label style="color:rgb(112, 30, 137)">CONTRACTS</label></h2>
+    <table border="1">
+        <tr>
+            
+            <th>contract_id</th>
+            <th>Manager Name</th>
+            <th>Total Price</th>
+            <th>Contract Status</th>
+            <th>Details</th>
+        </tr>
+        @foreach ($contract as $con)
+        <tr>
+            
+            <td>{{$con->contract_id}}</td>
+            <td>{{$con->manager_name}}</td>
+            <td>{{$con->total_price}}</td>
+            <td>{{$con->contract_status}}</td>
+            <td><a href="{{route('vendor.contractdetails',['contract_id'=>$con->contract_id])}}">VIEW ITEMS </a></td> 
 
-    
-</body>
-</html>
+        </tr>
+        @endforeach
+
+    </table>
+    <br>
+</center>
+
+@endsection

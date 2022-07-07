@@ -17,12 +17,15 @@ return new class extends Migration
             $table->id('order_id');
             $table->integer('contract_id');
             $table->integer('vendor_id');
-            // $table->string('vendor_name');
+            
+            $table->string('manager_name');//TONMOY IMPLEMENT
+
             $table->string('manager_id');
             //$table->integer('cart_id');
             $table->string('med_name');
             $table->integer('quantity');
             $table->integer('total_price');
+
             $table->dateTime('accepted_time')->nullable();
             $table->dateTime('delivery_time')->nullable();
             $table->string('contract_status')->default('Pending');

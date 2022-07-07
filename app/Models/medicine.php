@@ -19,5 +19,6 @@ class medicine extends Model
     public function contract()
     {
         return $this->belongsTo(contract::class,'contract_id','contract_id');
-    }
+     }
+    
 }

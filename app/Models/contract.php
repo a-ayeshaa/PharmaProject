@@ -25,4 +25,5 @@ class contract extends Model
     {
         return $this->belongsTo(supply_cart::class,'cart_id','cart_id');
     }
+   
 }
