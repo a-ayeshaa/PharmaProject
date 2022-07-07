@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('courier_name');
             //$table->string('courier_pass');
             $table->string('courier_email')->unique();
+            $table->integer('due_delivery_fee')->default(0);
             //$table->date('courier_dob');
             $table->timestamps();
         });

@@ -9,7 +9,7 @@
         <th>Customer Id</th>
         <th>Order Status</th>
         <th>Delivery Time</th>
-        <th>Accept</th>
+        <th>Delivered</th>
     </tr>
     @foreach ($AcceptedOrders as $order)
     <tr>

@@ -162,11 +162,11 @@ Route::get('/vendor/market',[vendorcontroller::class,'market'])->name('vendor.ma
 
 
 //Courier***************************************************************************************************************************************
-Route::get('/courier/home',[CourierController::class,'courierHome'])->name('courier.home');
-Route::get('/courier/profile/{name}',[CourierController::class,'courierProfile'])->name('courier.profile');
-Route::get('/courier/order',[CourierController::class,'orderView'])->name('courier.order');
-Route::get('/courier/acceptedOrder',[CourierController::class,'AcceptedOrderView'])->name('courier.AcceptedOrder');
-Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name('order.accept');
-Route::get('/courier/deliverd/{order_id}',[CourierController::class,'deliveredOrder'])->name('order.deliverd');
-Route::get('/courier/mail/{order}',[CourierController::class,'sendMail'])->name('courier.mail');
-
+Route::get('/courier/home',[CourierController::class,'courierHome'])->name('courier.home')->middleware('courierAuth');
+Route::get('/courier/profile/{id}',[CourierController::class,'courierProfile'])->name('courier.profile')->middleware('courierAuth');
+Route::get('/courier/order',[CourierController::class,'orderView'])->name('courier.order')->middleware('courierAuth');
+Route::get('/courier/acceptedOrder',[CourierController::class,'AcceptedOrderView'])->name('courier.AcceptedOrder')->middleware('courierAuth');
+Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name('order.accept')->middleware('courierAuth');
+Route::get('/courier/deliverd/{order_id}',[CourierController::class,'deliveredOrder'])->name('order.deliverd')->middleware('courierAuth');
+Route::get('/courier/mail/{order_id}',[CourierController::class,'sendMail'])->name('courier.mail')->middleware('courierAuth');
+Route::post('/courier/profile/{id}',[CourierController::class,'courierProfileEdit'])->name('courier.profile.edit')->middleware('courierAuth');

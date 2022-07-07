@@ -22,7 +22,7 @@
         </ul>
         <ul class="flex items-center">
             <li>
-                {{-- <a href="" class="p-3 capitalize">{{$name}}</a> --}}
+                <a href="{{route('courier.profile',['id'=>Session::get('name')])}}" class="p-3 capitalize">Profile</a>
             </li>
             <li>
                 <form action="{{route('logout')}}" method="get" class="inline p-3">
