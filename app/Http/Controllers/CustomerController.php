@@ -26,7 +26,11 @@ class CustomerController extends Controller
         session()->put('name',$customer->customer_name);
         session()->put('customer_id',$customer->customer_id);
         session()->put('email',$customer->customer_email);
-        return view('CustomerView.home')->with('name',$customer->customer_name);
+        $meds=medicine::paginate(10);
+
+        // return view('CustomerView.medlist',compact('meds'));
+        return view('CustomerView.home')->with('name',$customer->customer_name)
+                                        ->with('meds',$meds);
     }
 
     public function customerAccount()
@@ -50,14 +54,8 @@ class CustomerController extends Controller
         $u_id=$req->u_id;
         $this->validate($req,
         [
-            "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
-            "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-            "confirmPassword"=>"required|same:password",
-            "profilepic"=>"mimes:jpg,png,jpeg"
-        ],
-        [
-            "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
-
+            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+            // "profilepic"=>"mimes:jpg,png,jpeg"
         ]);
         
         if ($req->hasFile('profilepic'))
@@ -67,14 +65,15 @@ class CustomerController extends Controller
             //
             users::where('u_id',$u_id)
                         ->update(
-                            ['u_name'=>$req->name,
-                            'u_pass'=>$req->password
+                            [
+                                'u_name'=>$req->name,
                             ]
                         );
             customer::where('customer_id',$req->customer_id)
                         ->update(
-                            ['customer_name'=>$req->name,
-                            'img'=>$imgname
+                            [
+                                'customer_name'=>$req->name,
+                                'img'=>$imgname
                             ]
                         );
         }
@@ -82,15 +81,14 @@ class CustomerController extends Controller
         {
             users::where('u_id',$u_id)
                         ->update(
-                            ['u_name'=>$req->name,
-                            'u_email'=>$req->email,
-                            'u_pass'=>$req->password
+                            [
+                                'u_name'=>$req->name,
                             ]
                         );
             customer::where('customer_id',$req->customer_id)
             ->update(
-                ['customer_name'=>$req->name,
-                'customer_email'=>$req->email
+                [
+                    'customer_name'=>$req->name,
                 ]
             );
         }
@@ -114,19 +112,23 @@ class CustomerController extends Controller
     {
         if($req->add=="SEARCH")
         {
-            $meds=medicine::where('med_name','LIKE',$req->search.'%')->paginate(10);
+            if($req->filter=="ORDER BY PRICE HIGHEST TO LOWEST")
+            {
+                $meds=medicine::where('med_name','LIKE','%'.$req->search.'%')->orderBy('price_perUnit','DESC')->paginate(10);
+            }
+
+            else if($req->filter=="ORDER BY PRICE LOWEST TO HIGHEST")
+            {
+                $meds=medicine::where('med_name','LIKE','%'.$req->search.'%')->orderBy('price_perUnit','ASC')->paginate(10);
+            }
+
+            else
+            {
+                $meds=medicine::where('med_name','LIKE','%'.$req->search.'%')->paginate(10);
+            }
         }
-        else if($req->add=="ORDER BY PRICE HIGHEST TO LOWEST")
-        {
-            $meds=medicine::orderBy('price_perUnit','DESC')->paginate(10);
-            // return $meds;
-        }
-        else if($req->add=="ORDER BY PRICE LOWEST TO HIGHEST")
-        {
-            $meds=medicine::orderBy('price_perUnit','ASC')->paginate(10);
-            // return $meds;
-        }
-        else
+     
+        else if ($req->add=='ADD TO CART')
         {
             $this->validate($req,
             [
@@ -139,30 +141,41 @@ class CustomerController extends Controller
             ]);
 
             //find cart_id
-
-            $info=order::orderBy('cart_id','DESC')->first();
-            
             $med=medicine::where('med_id',$req->med_id)->first();
-            $cart= new carts();
-            if ($info==NULL)
+            $carts=carts::where('med_id',$req->med_id)->first();
+            if ($carts==NULL)
             {
-                $cart->cart_id=1;
+                $info=order::orderBy('cart_id','DESC')->first();
+            
+                $cart= new carts();
+                if ($info==NULL)
+                {
+                    $cart->cart_id=1;
+                }
+                else
+                {
+                    $cart->cart_id=$info->cart_id+1;
+                }  
+                $cart->customer_id=session()->get('customer_id');
+                $cart->med_id= $req->med_id;
+                $cart->price_perUnit=$med->price_perUnit;
+                $cart->med_name=$med->med_name;
+                $cart->quantity=$req->quantity;
+                $cart->total=$req->quantity*$med->price_perUnit;
+                $cart->save();
+
+               
             }
             else
             {
-                $cart->cart_id=$info->cart_id+1;
-            }  
-            $cart->customer_id=session()->get('customer_id');
-            $cart->med_id= $req->med_id;
-            $cart->price_perUnit=$med->price_perUnit;
-            $cart->med_name=$med->med_name;
-            $cart->quantity=$req->quantity;
-            $cart->total=$req->quantity*$med->price_perUnit;
-            $cart->save();
+                carts::where('med_id',$req->med_id)
+                    ->update(['quantity'=>$carts->quantity+$req->quantity,'total'=>$carts->total+$req->quantity*$med->price_perUnit]);
+            }
 
             medicine::where('med_id',$req->med_id)->update(['Stock'=>$req->Stock-$req->quantity]);
             $subtotal=session()->get('subtotal')+$req->quantity*$med->price_perUnit;
             session()->put('subtotal',$subtotal);
+
             $meds=medicine::paginate(10);
 
         }
@@ -184,7 +197,7 @@ class CustomerController extends Controller
         $info=order::orderBy('cart_id','DESC')->first();
         $order=new order();
         $order->customer_id=session()->get('customer_id');
-        $order->totalbill=session()->get('subtotal');
+        $order->totalbill=session()->get('subtotal')+15;
         if ($info==NULL)
         {
             $order->cart_id=1;
@@ -222,6 +235,13 @@ class CustomerController extends Controller
 
     public function clearCart()
     {
+
+        $cart=carts::all();
+        foreach ($cart as $item)
+        {
+            $med=medicine::where('med_id',$item->med_id)->first();
+            medicine::where('med_id',$item->med_id)->update(['Stock'=>$med->Stock+$item->quantity]);   
+        }
         carts::truncate();
         session()->flash('msg','CART CLEARED');
         session()->forget('subtotal');
@@ -307,6 +327,15 @@ class CustomerController extends Controller
 
     function cancelOrder($order_id)
     {
+        $orders=order::where('order_id',$order_id)->get();
+        foreach ($orders as $order)
+        {
+            foreach($order->orders_cart as $item)
+            {
+                $med=medicine::where('med_id',$item->med_id)->first();
+                medicine::where('med_id',$item->med_id)->update(['Stock'=>$med->Stock+$item->quantity]);   
+            }
+        }
         order::where('order_id',$order_id)->update(['order_status'=>'Cancelled']);
         return back();
     }
@@ -322,5 +351,46 @@ class CustomerController extends Controller
                                                                                $req->msg));
         session()->flash('emailsent','EMAIL SENT SUCCESSFULLY');
         return back();                                                                      
+    }
+
+    //CHANGE PASSWORD
+
+    public function changePass()
+    {
+        $u_id=session()->get('logged.customer');
+        $customer=customer::where('u_id',$u_id)->first();
+        return view('CustomerView.changePass')->with('customer',$customer);
+    }
+
+    public function changedPass(Request $req)
+    {
+        $this->validate($req,
+        [
+            "c_password"=>"required",
+            "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
+            "confirmPassword"=>"required|same:password",
+        ],
+        [
+            "c_password.required"=>"Current Password is required.",
+            "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
+
+        ]);
+        $customer=users::where('u_email',$req->email)->first();
+        if ($customer->u_pass==$req->c_password)
+        {
+            users::where('u_email',$req->email)
+                        ->update(
+                            [
+                                'u_pass'=>$req->password
+                            ]
+                        );
+            session()->flash('msg',"Password has been updated.");
+            return back();
+        }
+        else
+        {
+            session()->flash('msg',"Current Password does not match.");
+            return back();
+        }
     }
 }

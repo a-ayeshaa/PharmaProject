@@ -1,5 +1,6 @@
 @extends('CustomerLayout.top')
 @section('content')
+<title>Orders</title>
     <h3>CART LIST</h3>
     <fieldset style="width:30%">
         <legend> <b>{{Session::get('name')}}</b></legend>
@@ -13,7 +14,7 @@
                 <th></th>
                 <th>OrderID</th>
                 <th>ORDER STATUS</th>
-                <th>BILL</th>
+                <th>BILL(D.C inclusive)</th>
                 <th>ACCEPTED TIME</th>
                 <th>DELIVERY TIME</th>
                 <th>ORDER ITEMS</th>

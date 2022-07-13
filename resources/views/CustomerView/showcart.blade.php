@@ -1,5 +1,6 @@
 @extends('CustomerLayout.top')
 @section('content')
+<title>Cart</title>
     <h3>CART LIST</h3>
     <fieldset style="width:30%">
         <legend> <b>{{Session::get('name')}}</b></legend>
@@ -26,7 +27,8 @@
             @endforeach
         </table>
         <br><br>
-        <b>Subtotal = ${{Session::get('subtotal')}}<b>
+        {{-- <b>Delivery Charge = $15</b> <br> --}}
+        <b>Subtotal = ${{Session::get('subtotal')}} + $15(delivery charge)<b>
         <br><br>
         
         <form action="" method="POST">

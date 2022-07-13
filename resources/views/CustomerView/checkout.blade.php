@@ -1,5 +1,6 @@
 @extends('CustomerLayout.top')
 @section('content')
+<title>Checkout</title>
     <center>
         <fieldset>
             <legend><h3>ORDER DETAILS</h3></legend>

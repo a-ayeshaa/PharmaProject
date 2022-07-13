@@ -1,6 +1,9 @@
 @extends('AllUserLayout.top')
+<title>PHARMACY REGISTRATION</title>
 @section('content')
+<center>
     <h1>REGISTRATION FORM OF {{$type}}</h1>
+    <fieldset style="width: 30%"> <br>
     <form method="POST" action="">
         {{ csrf_field() }}
         Name : <input type="text" name="name" placeholder="Name" value="{{old('name')}}">
@@ -29,4 +32,6 @@
         <br>
         <input type="submit" name="register" value="REGISTER">
     </form>
+    </fieldset>
+</center>
 @endsection

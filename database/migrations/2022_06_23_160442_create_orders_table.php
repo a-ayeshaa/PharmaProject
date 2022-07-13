@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('order_status')->default('pending');
             $table->dateTime('accepted_time')->nullable();
             $table->dateTime('delivery_time')->nullable();
-            $table->integer('delivery_charge')->default(60);
+            $table->integer('delivery_charge')->default(15);
         });
     }
 

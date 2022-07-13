@@ -1,5 +1,6 @@
 @extends('CustomerLayout.top')
 @section('content')
+<title>File a complain</title>
 <center>
 <fieldset style="width:50%">
     <legend>File a complain</legend>

@@ -1,5 +1,6 @@
 @extends('CustomerLayout.top')
 @section('content')
+<title>Modified Information</title>
     <h3>ACCOUNT INFORMATION OF {{Str::upper($customer->customer_name)}}</h3> 
 
     <h4>
