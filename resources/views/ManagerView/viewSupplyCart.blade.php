@@ -2,6 +2,7 @@
 @section('content')
 <body bgcolor="#CCCCFF">
     <h2><u>Cart Information</u></h2>
+    @if(count($data)>0)
     <table border="1">
         <tr>
             <th>Cart ID</th>
@@ -32,5 +33,8 @@
         {{ csrf_field() }}
         <input type="submit" name="confirm" value="Confirm Order">
     </form>
+    @else
+    <br> Empty Cart!! <br>
+    @endif
 </body>
 @endsection

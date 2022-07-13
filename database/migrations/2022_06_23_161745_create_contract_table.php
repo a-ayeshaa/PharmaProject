@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('contract_id');
             $table->integer('vendor_id');
             
-            $table->string('manager_name');//TONMOY IMPLEMENT
+            //$table->string('manager_name');//TONMOY IMPLEMENT
 
             $table->string('manager_id');
             //$table->integer('cart_id');
