@@ -1,5 +1,6 @@
 @extends('CustomerLayout.top')
 @section('content')
+<title>Return Items</title>
     @foreach ($order as $delivered)
     <fieldset style="width:30%">
         OrderID: {{$delivered->order_id}} <br>

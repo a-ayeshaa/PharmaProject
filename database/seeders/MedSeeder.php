@@ -31,24 +31,10 @@ class MedSeeder extends Seeder
         //     ]);
         // }
 
-        // for ($i=10; $i<21; $i++)
-        // {
-        //     DB::table('medicine')->insert([
-        //         'med_name' => 'Napa'.$i,
-        //         'price_perunit' =>rand(5,10),
-        //         'manufacturingDate'=>date("Y/m/d"),
-        //         'expiryDate'=>date("Y/m/d"),
-        //         'vendor_id'=>$i,
-        //         'vendor_name'=>'Khondu'.$i,
-        //         'contract_id'=>rand(0,5),
-        //         'Stock'=>rand(10,50)
-        //     ]);
-        // }
-
-        for ($i=21; $i<31; $i++)
+        for ($i=10; $i<21; $i++)
         {
             DB::table('medicine')->insert([
-                'med_name' => 'Paracetemol'.$i,
+                'med_name' => 'Napa'.$i,
                 'price_perunit' =>rand(5,10),
                 'manufacturingDate'=>date("Y/m/d"),
                 'expiryDate'=>date("Y/m/d"),
@@ -58,5 +44,19 @@ class MedSeeder extends Seeder
                 'Stock'=>rand(10,50)
             ]);
         }
+
+        // for ($i=21; $i<31; $i++)
+        // {
+        //     DB::table('medicine')->insert([
+        //         'med_name' => 'Paracetemol'.$i,
+        //         'price_perunit' =>rand(5,10),
+        //         'manufacturingDate'=>date("Y/m/d"),
+        //         'expiryDate'=>date("Y/m/d"),
+        //         'vendor_id'=>$i,
+        //         'vendor_name'=>'Khondu'.$i,
+        //         'contract_id'=>rand(0,5),
+        //         'Stock'=>rand(10,50)
+        //     ]);
+        // }
     }
 }

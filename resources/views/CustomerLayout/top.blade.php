@@ -1,6 +1,7 @@
 <html>
     <head>
-        <a href="{{route('logout')}}">LOGOUT</a> 
+        <a href="{{route('logout')}}">LOGOUT</a> <br>
+        <a href="{{route('customer.change.pass')}}">CHANGE PASSWORD</a>
         
         <center><h2>PHARMACY</h2></center> 
         <h3>

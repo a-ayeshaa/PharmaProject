@@ -36,8 +36,23 @@ Route::post('/login',[AllUserController::class,'loginSubmit'])->name('user.login
 Route::get('/logout',[AllUserController::class,'logout'])->name('logout');
 
 
+//OTP SENDING AND CHANGING PASSWORD
+
+Route::get('/forgotpassword',[AllUserController::class,'forgotPassword'])->name('user.forgot.password');
+Route::post('/forgotpassword',[AllUserController::class,'forgotPasswordVerify'])->name('user.forgot.password.verify');
+
+Route::get('/verify/{email}',[AllUserController::class,'OTP'])->name('user.otp')->middleware('AuthChangePassword');
+Route::post('/verify/{email}',[AllUserController::class,'OTPverify'])->name('user.verify.otp')->middleware('AuthChangePassword');
+
+Route::get('/changePassword/{email}',[AllUserController::class,'ChangePassword'])->name('user.change.password')->middleware('AuthChangePassword');
+Route::post('/changePassword/{email}',[AllUserController::class,'ChangedPassword'])->name('user.changed.password')->middleware('AuthChangePassword');
+
+
+
 //CUSTOMER**************************************************************************************************************************************
 Route::get('/customer/home',[CustomerController::class,'customerHome'])->name('customer.home')->middleware('AuthCustomer');
+Route::post('/customer/home',[CustomerController::class,'addToCart'])->name('customer.home.add.to.cart')->middleware('AuthCustomer');
+
 Route::get('/customer/account/{name}',[CustomerController::class,'customerAccount'])->name('customer.account')->middleware('AuthCustomer');
 
 Route::get('/customer/account/modify/{name}',[CustomerController::class,'customerModifyAccount'])->name('customer.modify.account')->middleware('AuthCustomer');
@@ -66,6 +81,10 @@ Route::get('/customer/order/cancel/{order_id}',[CustomerController::class,'cance
 
 Route::get('/customer/complain',[CustomerController::class,'complain'])->name('customer.complain')->middleware('AuthCustomer');
 Route::post('/customer/complain',[CustomerController::class,'complainEmail'])->name('customer.complain.email')->middleware('AuthCustomer');
+
+Route::get('/customer/change_password',[CustomerController::class,'changePass'])->name('customer.change.pass')->middleware('AuthCustomer');
+Route::post('/customer/change_password',[CustomerController::class,'changedPass'])->name('customer.changed.pass')->middleware('AuthCustomer');
+
 
 
 

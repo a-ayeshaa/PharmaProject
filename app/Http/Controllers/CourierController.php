@@ -71,7 +71,7 @@ class CourierController extends Controller
     public function sendMail($order_id){
         $order=order::where('order_id',$order_id)->first();
         $customer=customer::where('customer_id',$order->customer_id)->first();
-        //Mail::to($customer->customer_email)->send(new orderAccepted($order));
+        // Mail::to($customer->customer_email)->send(new orderAccepted($order));
         Mail::to('tahmidislam73@gmail.com')->send(new orderAccepted($order));
         return redirect()->route('courier.order');
     }

@@ -1,5 +1,6 @@
 @extends('CustomerLayout.top')
 @section('content')
+<title>Account</title>
 <center>
 <fieldset style="width:30%">
     <legend><h3>ACCOUNT INFORMATION OF {{Str::upper($customer->customer_name)}}</h3></legend> 

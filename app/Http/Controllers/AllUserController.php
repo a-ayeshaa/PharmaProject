@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OTPCode;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\users;
 use App\Models\customer;
@@ -9,6 +11,10 @@ use App\Models\manager;
 use App\Models\vendor;
 use App\Models\courier;
 use App\Models\carts;
+use App\Models\users_otp;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+
 
 use function PHPUnit\Framework\isNull;
 
@@ -18,7 +24,7 @@ class AllUserController extends Controller
 
     public function welcome()
     { 
-        return view('user.welcome');
+        return redirect()->route('user.login');
     }
 
     //REGISTRATION FOR ALL USERS 
@@ -46,10 +52,10 @@ class AllUserController extends Controller
 
         $this->validate($req,
         [
-            "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
-            "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-            "confirmPassword"=>"required|same:password",
-            "email"=>"required|unique:users,u_email"
+            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+            // "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
+            // "confirmPassword"=>"required|same:password",
+            // "email"=>"required|unique:users,u_email"
         ],
         [
             "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
@@ -113,6 +119,7 @@ class AllUserController extends Controller
 
     public function login()
     {
+        // session()->flush();
         return view('AllUserView.Login');
     }
     
@@ -169,5 +176,132 @@ class AllUserController extends Controller
         carts::truncate();
         session()->flash('msg','Sucessfully Logged out');
         return redirect()->route('user.login');
+    }
+
+    //FORGOT PASSWORD
+
+    public function forgotPassword()
+    {
+        return view('AllUserView.ForgotPass');
+    }
+
+    public function forgotPasswordVerify(Request $req)
+    {
+        $user=users_otp::where('u_email',$req->u_email)->first();
+        $this->validate($req,
+        [
+            'u_email'=>'required|exists:users,u_email'
+        ],
+        [
+            'u_email.exists'=>'This email does not exist! Please enter an existing email.',
+            'u_email.required'=>'Please write your email.'
+        ]);
+        $OTP=rand('100000','999999');
+        if ($user==NULL)
+        {
+            $user=new users_otp();
+            $user->u_email=$req->u_email;
+            $user->OTP=Hash::make($OTP);
+            $user->save();
+        }
+        else
+        {
+            users_otp::where('u_email',$req->u_email)->update(['OTP'=>Hash::make($OTP)]);
+        }
+        session()->put('email',$req->u_email);
+        mail::to($req->u_email)->send(new OTPCode("OTP Code",$req->u_email,$OTP));
+        return redirect()->route('user.otp',['email'=>$req->u_email]);
+    }
+
+    //OTP CODE VERIFY
+
+    function OTP($email)
+    {
+        if($email==session()->get('email'))
+        {
+            return view('AllUserView.OtpVerify')->with('email',$email);
+        }
+
+        else
+        {
+            users_otp::where('u_email',session()->get('email'))->update(['OTP'=>NULL]);
+            session()->flush();
+            return redirect()->route('user.login');
+        }
+    }
+
+    function OTPVerify($email,Request $req)
+    {
+        $this->validate($req,
+        [
+            'code'=>'required'
+        ]);
+        if($email==session()->get('email'))
+        {
+            $user=users_otp::where('u_email',$email)->first();
+            if(Hash::check($req->code,$user->OTP))
+            {
+                return redirect()->route('user.change.password',['email'=>$email]);
+            }
+            else
+            {
+                session()->flash('msg','OTP does not match, Try again!');
+                return back();
+            }
+        }
+
+        //IF USER DOES NOT MATCH SESSION CLEAR ALL SESSION AND GO TO LOGIN
+        else
+        {
+            users_otp::where('u_email',session()->get('email'))->update(['OTP'=>NULL]);
+            session()->flush();
+            return redirect()->route('user.login');
+        }
+       
+    }
+
+    //CHANGE PASSWORD
+
+    function ChangePassword($email)
+    {
+        if($email==session()->get('email'))
+        {
+            return view('AllUserView.ChangePassword',['email'=>$email]);
+        }
+        else
+        {
+            users_otp::where('u_email',session()->get('email'))->update(['OTP'=>NULL]);
+            session()->flush();
+            return redirect()->route('user.login');
+        }
+
+    }
+
+    function ChangedPassword($email,Request $req)
+    {
+        
+        if($email==session()->get('email'))
+        {
+            $this->validate($req,
+            [
+                "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
+                "confirmPassword"=>"required|same:password"
+            ],
+            [
+                "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
+    
+            ]);
+
+            users::where('u_email',$email)->update(['u_pass'=>$req->password]);
+            users_otp::where('u_email',$email)->update(['OTP'=>NULL,'last_changed_at'=>Carbon::now()]);
+            session()->flush();
+            return redirect()->route('user.login');
+        }
+        else
+        {
+            users_otp::where('u_email',session()->get('email'))->update(['OTP'=>NULL]);
+            session()->flush();
+            return redirect()->route('user.login');
+        }
     }
 }
