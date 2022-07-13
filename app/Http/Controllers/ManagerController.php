@@ -30,7 +30,7 @@ class ManagerController extends Controller
         return view('ManagerView.Homepage')->with('manager',$val);
     }
 
-    public function HomeAction(Request $req) // selecting buttono actions
+    public function HomeAction(Request $req) // selecting button actions
     {
         if($req->action=='View Users')
         {
@@ -82,7 +82,7 @@ class ManagerController extends Controller
             {
                 return redirect()->route('search.medicine');
             }
-            else if($req->search=="Contract")
+            else if($req->search=="contract")
             {
                 return redirect()->route('search.contract');
             }
@@ -250,6 +250,7 @@ class ManagerController extends Controller
 
     public function contractDelete($id)
     {
+
         contract::where("contract_id",$id)->delete();
         return back();
     }
@@ -293,15 +294,44 @@ class ManagerController extends Controller
         $this->validate($req,
         [
             'amount' => 'gt:0'
+        ],
+        [
+            'amount.gt' => 'Quantity must be atleast 1'
         ]);
         if($req->add=="Add to Cart")
         {
             $val=supply::where("supply_id",$req->id)->first();
+            if($req->amount>$val->stock) //stock check
+            {
+                session()->flash('message','Sorry, we are currently low on stock!');
+                return back();
+            }
             $stock=$val->stock;
             $amount=$req->amount;
             $new=$stock-$amount;
+            session()->put('newStock',$new);
+
+            supply::where('supply_id',$req->id)  //stock update
+            ->update(
+                ['stock'=>$new]
+            );
+
             $unit=$val->price_perUnit;
             $total=$unit*$amount;
+
+            $dat=supply_cart::all();
+            for ($i=0; $i < count($dat); $i++) //checking if item already added
+            { 
+                if($val->med_id==$dat[$i]->med_id)
+                {
+                    supply_cart::where('med_id',$val->med_id)
+                    ->update(
+                        ['quantity'=>$req->amount+$dat[$i]->quantity,
+                        'total_price'=>$total+$dat[$i]->total_price]
+                    );
+                    return back();
+                }
+            }
 
             $item = new supply_cart();
             // return $val->name;
@@ -312,10 +342,10 @@ class ManagerController extends Controller
             $item->quantity=$req->amount;
             $item->total_price=$total;
             $item->save();
-            supply::where('supply_id',$req->id)
-            ->update(
-                ['stock'=>$new]
-            );
+            // supply::where('supply_id',$req->id)
+            // ->update(
+            //     ['stock'=>$new]
+            // );
             return back();
         }
         elseif($req->add=="View Items")
@@ -343,6 +373,14 @@ class ManagerController extends Controller
 
     public function removeCart($id)
     {
+        $val=supply_cart::where('cart_id',$id)->first();
+        $val2=supply::where('med_id',$val->med_id)->first();
+        $quantity=$val->quantity+$val2->stock;
+        supply::where('med_id',$val->med_id)
+            ->update(
+                ['stock'=>$quantity]
+            );
+        //     return back();
         supply_cart::where("cart_id",$id)->delete();
 
         return back();
@@ -364,9 +402,6 @@ class ManagerController extends Controller
             $item->contract_id=$id;
             $item->vendor_id=$val->vendor_id;
             $item->manager_id=session()->get('logged.manager');
-            //$item->vendor_name=$val->supply->vendor_name;
-            //$item->manager_name=$val
-            // $item->cart_id=$val->cart_id;
             $item->med_name=$val->med_name;
             $item->quantity=$val->quantity;
             $item->total_price=$val->total_price;
@@ -395,9 +430,6 @@ class ManagerController extends Controller
     
     public function editProfile(Request $req)
     {
-
-       // $val=users::where('u_id',$id)->first();
-
         return redirect()->route("manager.editPage");
     }
 
@@ -422,16 +454,45 @@ class ManagerController extends Controller
         //     }
         // }
         //$val=session()->get('manager.password');
+        $pWord=users::where('u_id',session()->get('logged.manager'))->first();
+        if($req->password==null)
+        {
+            if ($req->hasFile('propics'))
+            {
+                $img = session()->get('logged.manager').".jpg";
+                $req->file('propics')->storeAs('public/propics',$img);
+                if($req->pass==null )
+                
+                manager::where('manager_id',session()->get('manager.id'))
+                            ->update(
+                                ['image'=>$img],
+                            );
+            }
+            else
+            {
+                session()->flash('ms','Nothing to update!');
+                return back();
+            }
+            return redirect()->route('manager.profile');
+        }
+        //return session()->get('logged.manager');
+        //return $pWord;
+        else if($req->password!=$pWord->u_pass)
+        {
+            session()->flash('ms','Current Password does not match!');
+            return back();
+        }
         $this->validate($req,
         [
-            // 'newPassword' => "",
-            'confirmPassword' => "same:newPassword"
+            //'password' => 'same:$pWord',
+            'newPassword' => "required",
+            'confirmPassword' => "required|same:newPassword"
         ],
         [
             //'password.required' => "Please enter current password!",
             //'password.same' => "Entered password does not match current password!",
-            //'newPassword.required' => "Please enter new password!",
-            //'confirmPassword.required' => "Please confirm new password!",
+            'newPassword.required' => "Please enter new password!",
+            'confirmPassword.required' => "Please confirm new password!",
             'confirmPassword.same' => "The new password does not match!"
         ]);
 
@@ -439,7 +500,7 @@ class ManagerController extends Controller
         {
             $img = session()->get('logged.manager').".jpg";
             $req->file('propics')->storeAs('public/propics',$img);
-            if($req->pass==null )
+            //if($req->pass==null )
             
             manager::where('manager_id',session()->get('manager.id'))
                         ->update(
@@ -488,7 +549,7 @@ class ManagerController extends Controller
     public function searchUser()
     {
         $val=users::where('u_id',session()->get('searchID'))->paginate(5);
-        return view("ManagerView.ViewTable")->with('data',$val);
+        return view("ManagerView.ViewTable")->with('Val',$val);
     }
 
     //search medicine
@@ -504,6 +565,18 @@ class ManagerController extends Controller
     public function searchContract()
     {
         $val=contract::where('contract_id',session()->get('searchID'))->paginate(5);
+        for ($i = count($val)-1; $i >=1; $i--)
+        {
+            for ($j = $i-1; $j >= 0; $j--)
+            {
+                if ($val[$i]->contract_id==$val[$j]->contract_id)
+                {
+                    $val[$j]->med_name=$val[$j]->med_name.",".$val[$i]->med_name;
+                    unset($val[$i]);
+                    $i--;
+                }
+            }
+        }
         return view("ManagerView.ViewContracts")->with('data',$val);
     }
     

@@ -19,7 +19,7 @@
                 <td>{{$it->med_name}}</td>
                 <td>{{$it->stock}}</td>
                 <td>{{$it->price_perUnit}}</td>
-                <td><input type="number" name="amount" placeholder="Add quantity" ></td>
+                <td><input type="number" min=0 name="amount" placeholder="Add quantity" ></td>
                 <td><input type="hidden" name="id" value="{{$it->supply_id}}"></td>
                 <td><input type="submit" name="add" value="Add to Cart"></td>
                 </form>
@@ -27,6 +27,7 @@
             @endforeach
 
         </table><br>
+        <h3>{{Session::get('message')}}</h3>
         @error('amount')
             {{$message}} <br> <br>
         @enderror
