@@ -139,8 +139,6 @@ Route::post('/manager/profile/edit',[ManagerController::class,'confirmEdit'])->n
 Route::get('/manager/table/query/accept/{id}',[ManagerController::class, 'queryAcc'])->name('query.accept')->middleware('managerAuth');
 //Query reject
 Route::get('/manager/table/query/reject/{id}',[ManagerController::class, 'queryDec'])->name('query.deny')->middleware('managerAuth');
-//Search method
-//Route::post('/manager/home',[ManagerController::class,'search'])->name('manager.search')->middleware('managerAuth');
 //search in user
 Route::get('/manager/search/user',[ManagerController::class, 'searchUser'])->name('search.user')->middleware('managerAuth');
 //search in medicine

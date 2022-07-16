@@ -484,13 +484,10 @@ class ManagerController extends Controller
         }
         $this->validate($req,
         [
-            //'password' => 'same:$pWord',
-            'newPassword' => "required",
+            'newPassword' => "required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
             'confirmPassword' => "required|same:newPassword"
         ],
         [
-            //'password.required' => "Please enter current password!",
-            //'password.same' => "Entered password does not match current password!",
             'newPassword.required' => "Please enter new password!",
             'confirmPassword.required' => "Please confirm new password!",
             'confirmPassword.same' => "The new password does not match!"
@@ -530,8 +527,13 @@ class ManagerController extends Controller
 
     public function queryAcc($id)
     {
+        $quan=orders_cart::where('id',$id)->first();
+        $med=medicine::where('med_id',$quan->med_id)->first();
+        $stock=$quan->quantity+$med->Stock;
         orders_cart::where('id',$id)
         ->update(['return_status'=>'accepted']);
+        medicine::where('med_id',$quan->med_id)
+        ->update(['Stock'=>$stock]);
         return back();
     }
 
