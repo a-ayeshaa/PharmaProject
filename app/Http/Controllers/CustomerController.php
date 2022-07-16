@@ -135,9 +135,9 @@ class CustomerController extends Controller
                 'quantity'=> 'required|numeric|max:'.$req->Stock.'|gt:0'
             ],
             [
-                'quantity.required'=>'Enter a quantity first',
-                'quantity.gt'=>'Minimum of order quantity=1 is required',
-                'quantity.max'=>'Quantity must be greater than stock'
+                'quantity.required'=>'You did not specify the amount!',
+                'quantity.gt'=>'Minimum order quantity must atleast be 1',
+                'quantity.max'=>'The required amount is not available'
             ]);
 
             //find cart_id
