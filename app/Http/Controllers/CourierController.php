@@ -55,6 +55,9 @@ class CourierController extends Controller
                 'delivery_time'=>$dateNtime,
             ]
         );
+
+        
+
         //$order=order::where('order_id',$order_id);
         $u_id=session()->get('logged.courier');
         $courier=courier::where('u_id',$u_id)->first();
@@ -103,6 +106,35 @@ class CourierController extends Controller
         ->update(
             ['courier_name'=>$req->name,
             'courier_email'=>$req->email
+            ]
+        );
+
+        session()->put('name',$name);
+        return redirect()->route('courier.profile',['id'=>$u_id]);
+    }
+
+    public function cashoutView(){
+        $u_id=session()->get('logged.courier');
+        $courier=courier::where('u_id',$u_id)->first();
+        return view('CourierView.cashout',['id',$u_id])->with('courier',$courier);
+    }
+
+    public function cashout(Request $req,$u_id)
+    {
+        $name=$req->name;
+        $u_id=$req->u_id;
+        $this->validate($req,
+        [
+            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+             "password"=>"required", //a|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
+             "confirmPassword"=>"required|same:password",
+            // "email"=>"required"
+        ]);
+
+        courier::where('courier_id',$req->courier_id)
+        ->update(
+            [
+                'due_delivery_fee'=>$req->availableAmount-$req->amount
             ]
         );
 

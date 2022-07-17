@@ -189,3 +189,5 @@ Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name
 Route::get('/courier/deliverd/{order_id}',[CourierController::class,'deliveredOrder'])->name('order.deliverd')->middleware('courierAuth');
 Route::get('/courier/mail/{order_id}',[CourierController::class,'sendMail'])->name('courier.mail')->middleware('courierAuth');
 Route::post('/courier/profile/{id}',[CourierController::class,'courierProfileEdit'])->name('courier.profile.edit')->middleware('courierAuth');
+Route::get('/courier/cashout/{id}',[CourierController::class,'cashoutView'])->name('courier.cashoutView')->middleware('courierAuth');
+Route::post('/courier/cashout/{id}',[CourierController::class,'cashout'])->name('courier.cashout')->middleware('courierAuth');

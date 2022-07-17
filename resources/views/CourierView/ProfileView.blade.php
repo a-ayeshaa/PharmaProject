@@ -3,6 +3,7 @@
     <h3>Profile {{Str::upper($courier->courier_name)}}</h3> 
 
     <h4>Delivery Amount {{$courier->due_delivery_fee}}</h4>
+    <a href="{{route('courier.cashoutView',['id',$courier->u_id])}}">Cashout</a>
 
     <form action="" method="POST" enctype="multipart/form-data">
         {{ csrf_field() }}
