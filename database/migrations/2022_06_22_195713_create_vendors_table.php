@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('vendor_name');
             $table->float('account')->default(0);
             $table->string('vendor_email')->unique();
+            $table->string('img')->nullable();
             $table->timestamps();
         });
     }

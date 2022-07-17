@@ -17,6 +17,11 @@
             
             <legend><h3>ACCOUNT INFORMATION OF <label style="color:rgb(68, 65, 255)">{{Str::upper($vendor->vendor_name)}}</label></h3> </legend>
             <h4>
+                @if ($vendor->img==NULL)
+            
+                @else
+                    <img src="{{ asset("storage/pictures/".$vendor->img)}}" alt="" srcset="" height="150" width="120"><br>   
+                @endif
                 NAME : {{ $vendor->vendor_name}}
                 <br><br><br>
                 VENDOR ID : {{ $vendor->vendor_id}}

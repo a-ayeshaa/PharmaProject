@@ -8,7 +8,7 @@
         </legend>
         
     
-        <form action="" method="POST" >
+        <form action="" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
             USER ID : <input type="text" name="u_id" placeholder=" {{$vendor->users->u_id}}" value=" {{$vendor->users->u_id}} " readonly>
             <br><br>
@@ -37,6 +37,11 @@
                 {{ $message}}<br>
             @enderror
             <br>
+            <input type="file" name="profilepic">
+            @error('profilepic')
+                {{ $message}}<br>
+            @enderror
+            <br><br>
             <input type="submit" name="modify" value="MODIFY">
         </form>
     
