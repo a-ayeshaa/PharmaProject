@@ -1,6 +1,7 @@
 @extends('AllUserLayout.account')
 @section('content')
 <body bgcolor="#CCCCFF">
+    @if(count($data)>0)
     <table border="1">
         <tr>
             <th>Contract ID</th>
@@ -24,5 +25,8 @@
         @endforeach   
     </table>
     {{$data->links()}}
+    @else
+    <br> No Data!! <br>
+    @endif
 </body>
 @endsection

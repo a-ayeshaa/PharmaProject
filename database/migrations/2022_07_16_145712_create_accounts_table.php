@@ -14,9 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id('date');
-            $table->integer('expenses');
-            $table->integer('revenue');
+            $table->id('serial');
+            $table->date('date');
+            $table->integer('expenses')->default('0');
+            $table->integer('revenue')->default('0');
         });
     }
 
