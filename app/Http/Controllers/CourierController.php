@@ -60,11 +60,21 @@ class CourierController extends Controller
         
         $date=Carbon::today()->toDateString();
         $new= order::where('order_id',$order_id)->first();
-        $item= new account();
-        $item->date= $date;
-        $item->revenue= $new->totalbill;
-        $item->save();
-
+        $rev=account::where('date',$date)->first();
+        if($rev)
+        {
+            $temp=$rev->revenue+$new->totalbill;
+            account::where('date',$date)
+            ->update(['revenue'=> $temp]);
+        }
+        else
+        {
+            $item= new account();
+            
+            $item->date= $date;
+            $item->revenue= $new->totalbill;
+            $item->save();
+        }
 
         //$order=order::where('order_id',$order_id);
         $u_id=session()->get('logged.courier');

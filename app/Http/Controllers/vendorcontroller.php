@@ -7,7 +7,8 @@ use App\Models\vendor;
 use App\Models\supply;
 use App\Models\contract;
 use App\Models\medicine;
-
+use App\Mail\AcceptContract;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 
 class vendorcontroller extends Controller
@@ -31,9 +32,11 @@ class vendorcontroller extends Controller
 
     public function contractstatus(Request $request){
         $status=$request->status;
+        $contract_id=session()->get('contract.contract_id');
+
         if($status=='Accept'){
             //contract update status
-            $contract_id=session()->get('contract.contract_id');
+            // $contract_id=session()->get('contract.contract_id');
             $modified = contract::where('contract_id',$contract_id) 
                         ->update(['contract_status'=>$status]);
         
@@ -59,18 +62,26 @@ class vendorcontroller extends Controller
                 $price=$new1->price_perUnit;
                 $price=$price*1.4;
 
+                $exist=medicine::where('med_id',$new1->med_id)->first();
+                if ($exist==NULL)
+                {
+                    $med= new medicine();
+                    $med->med_id = $new1->med_id;
+                    $med->med_name =$item->med_name;
+                    $med->price_perUnit =$price;
+                    $med->stock = $item->quantity;
+                    $med->contract_id = $contract_id;
+                    $med->expiryDate = $new1->expiryDate;
+                    $med->manufacturingDate = $new1->manufacturingDate;
+                    $med->vendor_id=$item->vendor_id;
+                    $med->vendor_name=$vendor_name;
+                    $med->save();
+                }
+                else
+                {
+                    medicine::where('med_id',$new1->med_id)->update(['stock'=>$exist->stock+$item->quantity]);
+                }
                 
-                $med= new medicine();
-                $med->med_id = $new1->med_id;
-                $med->med_name =$item->med_name;
-                $med->price_perUnit =$price;
-                $med->stock = $item->quantity;
-                $med->contract_id = $contract_id;
-                $med->expiryDate = $new1->expiryDate;
-                $med->manufacturingDate = $new1->manufacturingDate;
-                $med->vendor_id=$item->vendor_id;
-                $med->vendor_name=$vendor_name;
-                $med->save();
                 //update supply table
                 $quantity=$item->quantity;
                 $stock=supply::where('med_id',$new1->med_id)->value('stock');
@@ -84,13 +95,13 @@ class vendorcontroller extends Controller
             
         }
         elseif($status=='Reject'){
-             $contract_id=session()->get('contract.contract_id');
+            //  $contract_id=session()->get('contract.contract_id');
              $modified = contract::where('contract_id',$contract_id) 
                         ->update(['contract_status'=>$status]);
 
         }
         
-        
+        mail::to('tonmoysaha333@yahoo.com')->send(new AcceptContract("Contract Confirmation",$contract_id,$status));
         return redirect()->route('vendor.contracts');
 
     }
@@ -120,12 +131,16 @@ class vendorcontroller extends Controller
         [
             "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
             "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-            "confirmPassword"=>"required|same:password"
+            "confirmPassword"=>"required|same:password",
+            "profilepic"=>"mimes:jpg,png,jpeg"
         ],
         [
             "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
 
         ]);
+
+        $imgname = session()->get('logged.vendor').".jpg";
+        $req->file('profilepic')->storeAs('public/pictures',$imgname);
 
         $modified = users::where('u_id',$u_id) 
                             ->update(
@@ -135,7 +150,9 @@ class vendorcontroller extends Controller
         
         $vendor=vendor::where('u_id',$u_id)
                             ->update(
-                                ['vendor_name' =>$req->name]
+                                ['vendor_name' =>$req->name,
+                                'img'=>$imgname
+                                ]
                             );
         session()->flash("updated","Sucessfully Updated");
         $u_id=session()->get('logged.vendor');
@@ -202,9 +219,10 @@ class vendorcontroller extends Controller
     }
     //not done
 
-    public function deletesupply(){
+    public function deletesupply($supply_id){
         
-        return ;
+        supply::where('supply_id',$supply_id)->delete();
+        return redirect()->route('vendor.supply');
     }
 
     public function addedsupply(Request $req){

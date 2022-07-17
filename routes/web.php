@@ -173,7 +173,7 @@ Route::get('/vendor/addsupply',[vendorcontroller::class,'addsupply'])->name('ven
 Route::post('/vendor/addsupply',[vendorcontroller::class,'addedsupply'])->name('vendor.addedsupply')->middleware('authvendor');
 Route::get('/vendor/supply/update/{supply_id}',[vendorcontroller::class,'updatesupply'])->name('vendor.updatesupply')->middleware('authvendor');
 Route::post('/vendor/supply/update/{supply_id}',[vendorcontroller::class,'updatedsupply'])->name('vendor.updatedsupply')->middleware('authvendor');
-Route::get('/vendor/supply/delete',[vendorcontroller::class,'deletesupply'])->name('vendor.deletesupply')->middleware('authvendor');
+Route::get('/vendor/supply/delete/{supply_id}',[vendorcontroller::class,'deletesupply'])->name('vendor.deletesupply')->middleware('authvendor');
 
 //market
 Route::get('/vendor/market',[vendorcontroller::class,'market'])->name('vendor.market')->middleware('authvendor');

@@ -14,7 +14,11 @@
                 {{ $message}}<br>
             @enderror
         @else
-            <img src="{{ asset("storage/profilepictures/courier/".$courier->img)}}" alt="" srcset="" height="150" width="150" class="img-thumbnail" >           
+            <img src="{{ asset("storage/profilepictures/courier/".$courier->img)}}" alt="" srcset="" height="150" width="150" class="img-thumbnail" >  
+            <input type="file" name="profilepic">
+            @error('profilepic')
+                {{ $message}}<br>
+            @enderror         
         @endif
         <br><br>
         User Id : <input type="text" name="u_id" placeholder=" {{$courier->u_id}}" value=" {{$courier->u_id}} " readonly>
