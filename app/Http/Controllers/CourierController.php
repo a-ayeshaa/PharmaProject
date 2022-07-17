@@ -10,6 +10,7 @@ use App\Models\users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use PDO;
+use App\Models\account;
 use Carbon\Carbon;
 
 
@@ -55,6 +56,15 @@ class CourierController extends Controller
                 'delivery_time'=>$dateNtime,
             ]
         );
+
+        $date=Carbon::today()->toDateString();
+        $new= order::where('order_id',$order_id)->first();
+        $item= new account();
+        $item->date= $date;
+        $item->revenue= $new->totalbill;
+        $item->save();
+
+
         //$order=order::where('order_id',$order_id);
         $u_id=session()->get('logged.courier');
         $courier=courier::where('u_id',$u_id)->first();

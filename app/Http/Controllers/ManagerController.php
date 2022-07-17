@@ -16,6 +16,8 @@ use App\Models\contract;
 use App\Models\supply;
 use App\Models\supply_cart;
 use App\Models\orders_cart;
+use App\Models\account;
+use Carbon\Carbon;
 
 class ManagerController extends Controller
 {
@@ -534,6 +536,22 @@ class ManagerController extends Controller
         ->update(['return_status'=>'accepted']);
         medicine::where('med_id',$quan->med_id)
         ->update(['Stock'=>$stock]);
+        $date=Carbon::today()->toDateString();
+        $rev=account::where('date',$date)->first();
+        $price= $quan->quantity*$med->price_perUnit;
+        if($rev)
+        {
+            $temp= $rev->revenue-$price;
+            account::where('date',$date)
+            ->update(['revenue'=> $temp]);
+        }
+        else
+        {
+            $item= new account();
+            $item->date= Carbon::today()->toDateString();
+            $item->revenue= 0-$price;
+            $item->save();
+        }
         return back();
     }
 
