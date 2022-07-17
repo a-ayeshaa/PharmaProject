@@ -26,7 +26,7 @@ class SupplySeeder extends Seeder
                 'stock' => rand(10,50),
                 'manufacturingDate'=>date("Y/m/d"),
                 'expiryDate'=>date("Y/m/d"),
-                'vendor_id'=>1,
+                'vendor_id'=>1
                 //'contract_id'=>rand(0,5)
             ]);
         }

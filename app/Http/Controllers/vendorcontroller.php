@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\users;
+use App\Models\manager;
 use App\Models\vendor;
 use App\Models\supply;
 use App\Models\contract;
@@ -19,9 +20,12 @@ class vendorcontroller extends Controller
     }
     public function contractdetails($contract_id){
         $contract=contract::where('contract_id',$contract_id)->get();
-        
+        // return $contract;
+        // return $contract->manager_id;
+        $manager_name=manager::where('manager_id',$contract[0]->manager_id)->first();
         session()->put('contract.contract_id',$contract_id);
-        return view ('vendor.contractdetails')->with('contract',$contract);
+        return view ('vendor.contractdetails')->with('contract',$contract)
+                                            ->with('manager_name',$manager_name->manager_name) ;
 
     }
 
@@ -48,7 +52,9 @@ class vendorcontroller extends Controller
             
             //add medicine
             foreach ($new as $item ) {
+                // return $item->vendor_id;
                 $vendor_name=vendor::where('vendor_id',$item->vendor_id)->value('vendor_name');
+                // return $vendor_name;
                 $new1=supply::where('med_name',$item->med_name)->first();
                 $price=$new1->price_perUnit;
                 $price=$price*1.4;
@@ -114,8 +120,7 @@ class vendorcontroller extends Controller
         [
             "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
             "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-            "confirmPassword"=>"required|same:password",
-            "email"=>"required|unique:users,u_email"
+            "confirmPassword"=>"required|same:password"
         ],
         [
             "password.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter."
@@ -125,14 +130,12 @@ class vendorcontroller extends Controller
         $modified = users::where('u_id',$u_id) 
                             ->update(
                                 ['u_name'=>$req->name,
-                                'u_email'=>$req->email,
                                 'u_pass'=>$req->password]
                             );
         
         $vendor=vendor::where('u_id',$u_id)
                             ->update(
-                                ['vendor_name' =>$req->name,
-                                'vendor_email' =>$req->email]
+                                ['vendor_name' =>$req->name]
                             );
         session()->flash("updated","Sucessfully Updated");
         $u_id=session()->get('logged.vendor');
@@ -142,7 +145,7 @@ class vendorcontroller extends Controller
 
     public function contracts(){
         
-        $contract=contract::select('contract_id','manager_name','total_price','contract_status')->distinct()->get();
+        $contract=contract::select('contract_id','manager_id','total_price','contract_status')->where('vendor_id',session()->get('logged.vendor_id'))->distinct()->get();
         
         return view ('vendor.contracts')->with('contract',$contract);
     }

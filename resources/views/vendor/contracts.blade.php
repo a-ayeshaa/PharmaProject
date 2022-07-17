@@ -5,7 +5,7 @@
         <tr>
             
             <th>contract_id</th>
-            <th>Manager Name</th>
+            <th>Manager ID</th>
             <th>Total Price</th>
             <th>Contract Status</th>
             <th>Details</th>
@@ -14,7 +14,7 @@
         <tr>
             
             <td>{{$con->contract_id}}</td>
-            <td>{{$con->manager_name}}</td>
+            <td>{{$con->manager_id}}</td>
             <td>{{$con->total_price}}</td>
             <td>{{$con->contract_status}}</td>
             <td><a href="{{route('vendor.contractdetails',['contract_id'=>$con->contract_id])}}">VIEW ITEMS </a></td> 

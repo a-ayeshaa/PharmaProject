@@ -27,6 +27,9 @@ class ManagerController extends Controller
     public function managerHome() //view manager homepage
     {
         $id=session()->get('logged.manager');
+
+        $manager=manager::where('u_id',$id)->first();
+        session()->put('manager_id',$manager->manager_id);
         $val=manager::where('u_id',$id)->first();
         session()->put('name',$val->manager_name);
         return view('ManagerView.Homepage')->with('manager',$val);
@@ -399,7 +402,14 @@ class ManagerController extends Controller
         $v=supply_cart::all();
         $dat=contract::orderby('order_id','DESC')->first();
         //$vend=vendor::where('vendor_id',$v[0]->vendor_id)->first();
-        $id=$dat->contract_id+1;
+        if($dat==NULL)
+        {
+            $id=1;
+        }
+        else
+        {
+           $id=$dat->contract_id+1;
+        }
 
         foreach($v as $val)
         {
@@ -407,14 +417,15 @@ class ManagerController extends Controller
 
             $item->contract_id=$id;
             $item->vendor_id=$val->vendor_id;
-            $item->manager_id=session()->get('logged.manager');
+            $item->manager_id=session()->get('manager_id');
             $item->med_name=$val->med_name;
             $item->quantity=$val->quantity;
             $item->total_price=$val->total_price;
             $item->save();
         }
         // $name=users::where('u_id',session()->get('logged.manager'))->first();
-        //mail::to('tonmoysaha333@yahoo.com')->send(new SupplyOrder("Suppy Order Placement","Hi",session()->get('logged.manager'),$v));
+
+        mail::to('faiyazkhondakar@gmail.com')->send(new SupplyOrder("Suppy Order Placement","Hi",session()->get('logged.manager'),$v));
         supply_cart::truncate();
         return redirect()->route("manager.tableSupplyOrder");
     }
