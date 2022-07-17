@@ -22,10 +22,7 @@
             {{ $message}}<br>
         @enderror
         <br>
-        <input type="file" name="profilepic">
-        @error('profilepic')
-            {{ $message}}<br>
-        @enderror
+
         <br><br>
         <input type="submit" name="modify" value="MODIFY">
 
