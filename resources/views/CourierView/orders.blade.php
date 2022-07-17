@@ -23,6 +23,6 @@
 
     </tr>
     @endforeach
-
+    <h5>{{$orders->links('pagination::bootstrap-5')}}</h5>
 </table>
 @endsection
