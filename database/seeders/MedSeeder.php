@@ -31,9 +31,10 @@ class MedSeeder extends Seeder
         //     ]);
         // }
 
-        for ($i=10; $i<21; $i++)
+        for ($i=50; $i<65; $i++)
         {
             DB::table('medicine')->insert([
+                'med_id'=>$i,
                 'med_name' => 'Napa'.$i,
                 'price_perunit' =>rand(5,10),
                 'manufacturingDate'=>date("Y/m/d"),

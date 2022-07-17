@@ -57,8 +57,8 @@ class CustomerController extends Controller
         $u_id=$req->u_id;
         $this->validate($req,
         [
-            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
-            // "profilepic"=>"mimes:jpg,png,jpeg"
+            "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+            "profilepic"=>"mimes:jpg,png,jpeg"
         ]);
         
         if ($req->hasFile('profilepic'))

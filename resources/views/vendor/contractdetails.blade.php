@@ -1,6 +1,6 @@
 @extends('vendor.layouts.toplayout')
 @section('content')
-<center><h2><label style="color:rgb(112, 30, 137)">CONTRACT DETAILS with {{Str::upper($contract[0]->manager_name)}}</h3> </legend> </label></h2>
+<center><h2><label style="color:rgb(112, 30, 137)">CONTRACT DETAILS with {{Str::upper($manager_name)}}</h3> </legend> </label></h2>
 Contract ID : {{$contract[0]->contract_id}}
 
 <table border="1">

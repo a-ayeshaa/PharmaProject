@@ -19,7 +19,7 @@
                 {{ $message}}<br>
             @enderror
             <br>
-            Email: <input type="email" name="email" placeholder="{{$vendor->vendor_email}}" value=" {{$vendor->vendor_email}} ">
+            Email: <input type="email" name="email" placeholder="{{$vendor->vendor_email}}" value=" {{$vendor->vendor_email}} " readonly>
             <br>
             @error('email')
                 {{ $message}}<br>
