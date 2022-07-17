@@ -12,6 +12,8 @@ use App\Models\medicine;
 use App\Models\carts;
 use App\Models\order;
 use App\Models\orders_cart;
+use App\Models\users_otp;
+use Carbon\Carbon;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class CustomerController extends Controller
@@ -26,6 +28,7 @@ class CustomerController extends Controller
         session()->put('name',$customer->customer_name);
         session()->put('customer_id',$customer->customer_id);
         session()->put('email',$customer->customer_email);
+
         $meds=medicine::paginate(10);
 
         // return view('CustomerView.medlist',compact('meds'));
@@ -135,9 +138,9 @@ class CustomerController extends Controller
                 'quantity'=> 'required|numeric|max:'.$req->Stock.'|gt:0'
             ],
             [
-                'quantity.required'=>'Enter a quantity first',
-                'quantity.gt'=>'Minimum of order quantity=1 is required',
-                'quantity.max'=>'Quantity must be greater than stock'
+                'quantity.required'=>'You did not specify the amount!',
+                'quantity.gt'=>'Minimum order quantity must be atleast 1',
+                'quantity.max'=>'The requested amount is not available'
             ]);
 
             //find cart_id
@@ -197,7 +200,7 @@ class CustomerController extends Controller
         $info=order::orderBy('cart_id','DESC')->first();
         $order=new order();
         $order->customer_id=session()->get('customer_id');
-        $order->totalbill=session()->get('subtotal')+15;
+        $order->totalbill=session()->get('subtotal');
         if ($info==NULL)
         {
             $order->cart_id=1;
@@ -225,7 +228,10 @@ class CustomerController extends Controller
             $add->med_id=$item->med_id;
             $add->save();
         }
-        mail::to('ayesha.akhtar.1999@gmail.com')->send(new OrderConfirmation("ORDER CONFIRMATION MAIL",session()->get('customer_id'),
+        // mail::to('ayesha.akhtar.1999@gmail.com')->send(new OrderConfirmation("ORDER CONFIRMATION MAIL",session()->get('customer_id'),
+        //                                                                        session()->get('name'),$information->cart_id));
+        $email=session()->get('email');
+        mail::to($email)->send(new OrderConfirmation("ORDER CONFIRMATION MAIL",session()->get('customer_id'),
                                                                                session()->get('name'),$information->cart_id));
         
         return redirect()->route('customer.check.out');
@@ -357,9 +363,21 @@ class CustomerController extends Controller
 
     public function changePass()
     {
-        $u_id=session()->get('logged.customer');
-        $customer=customer::where('u_id',$u_id)->first();
-        return view('CustomerView.changePass')->with('customer',$customer);
+        $info=users_otp::where('u_email',session()->get('email'))->first();
+        if ($info==NULL)
+        {
+            $u_id=session()->get('logged.customer');
+            $customer=customer::where('u_id',$u_id)->first();
+            return view('CustomerView.changePass')->with('customer',$customer)
+                                                ->with('time',NULL);
+        }
+        else
+        {
+            $u_id=session()->get('logged.customer');
+            $customer=customer::where('u_id',$u_id)->first();
+            return view('CustomerView.changePass')->with('customer',$customer)
+                                                  ->with('time',$info->last_changed_at);
+        }
     }
 
     public function changedPass(Request $req)
@@ -384,6 +402,18 @@ class CustomerController extends Controller
                                 'u_pass'=>$req->password
                             ]
                         );
+            $info=users_otp::where('u_email',session()->get('email'))->first();
+            if ($info==NULL)
+            {
+                $updated=new users_otp();
+                $updated->u_email=session()->get('email');
+                $updated->last_changed_at=Carbon::now();
+                $updated->save();
+            }
+            else
+            {
+                users_otp::where('u_email',session()->get('email'))->update(['last_changed_at'=>Carbon::now()]);
+            }
             session()->flash('msg',"Password has been updated.");
             return back();
         }

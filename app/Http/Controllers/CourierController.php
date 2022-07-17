@@ -10,6 +10,7 @@ use App\Models\users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use PDO;
+use App\Models\account;
 use Carbon\Carbon;
 
 
@@ -57,6 +58,13 @@ class CourierController extends Controller
         );
 
         
+        $date=Carbon::today()->toDateString();
+        $new= order::where('order_id',$order_id)->first();
+        $item= new account();
+        $item->date= $date;
+        $item->revenue= $new->totalbill;
+        $item->save();
+
 
         //$order=order::where('order_id',$order_id);
         $u_id=session()->get('logged.courier');
@@ -91,23 +99,54 @@ class CourierController extends Controller
         $u_id=$req->u_id;
         $this->validate($req,
         [
-            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+             "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
              "password"=>"required", //a|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
              "confirmPassword"=>"required|same:password",
-            // "email"=>"required"
+             "email"=>"required",
+             //"profilepic"=>"mimes:jpg,png,jpeg"
         ]);
-        users::where('u_id',$u_id)
-                    ->update(
-                        ['u_name'=>$req->name,
-                        'u_email'=>$req->email,
-                        'u_pass'=>$req->password]
-                    );
-        courier::where('courier_id',$req->courier_id)
-        ->update(
-            ['courier_name'=>$req->name,
-            'courier_email'=>$req->email
-            ]
-        );
+////////////////
+
+
+if ($req->hasFile('profilepic'))
+        {
+            $img = session()->get('logged.courier').".jpg";
+            $req->file('profilepic')->storeAs('public/profilepictures/courier/',$img);
+            //
+            users::where('u_id',$u_id)
+                        ->update(
+                            [
+                                'u_name'=>$req->name,
+                                'u_pass'=>$req->password
+                            ]
+                        );
+            courier::where('courier_id',$req->courier_id)
+            ->update(
+                [
+                    'courier_name'=>$req->name,
+                    'img'=>$img
+                ]
+            );
+        }
+        else
+        {
+            users::where('u_id',$u_id)
+            ->update(
+                [
+                'u_name'=>$req->name,
+                'u_pass'=>$req->password
+                ]
+                        );
+            courier::where('courier_id',$req->courier_id)
+            ->update(
+                [
+                    'courier_name'=>$req->name,
+                ]
+            );
+        }
+        
+///////////////
+
 
         session()->put('name',$name);
         return redirect()->route('courier.profile',['id'=>$u_id]);
@@ -123,12 +162,12 @@ class CourierController extends Controller
     {
         $name=$req->name;
         $u_id=$req->u_id;
+        $availableAmount=$req->availableAmount;
+        $amount=$req->amount;
+        //return $availableAmount;
         $this->validate($req,
         [
-            // "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
-             "password"=>"required", //a|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-             "confirmPassword"=>"required|same:password",
-            // "email"=>"required"
+            "amount"=> "lte:availableAmount"
         ]);
 
         courier::where('courier_id',$req->courier_id)

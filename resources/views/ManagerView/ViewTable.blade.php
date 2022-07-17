@@ -1,6 +1,7 @@
 @extends('AllUserLayout.account')
 @section('content')
 <body bgcolor="#CCCCFF">
+    @if(count($Val)>0)
     <table border="1">
         <tr>
             <th>User Id</th>
@@ -20,5 +21,8 @@
 
     </table>
     {{$Val->links()}}
+    @else
+    <br> No Data!! <br>
+    @endif
 </body>
 @endsection

@@ -139,8 +139,6 @@ Route::post('/manager/profile/edit',[ManagerController::class,'confirmEdit'])->n
 Route::get('/manager/table/query/accept/{id}',[ManagerController::class, 'queryAcc'])->name('query.accept')->middleware('managerAuth');
 //Query reject
 Route::get('/manager/table/query/reject/{id}',[ManagerController::class, 'queryDec'])->name('query.deny')->middleware('managerAuth');
-//Search method
-//Route::post('/manager/home',[ManagerController::class,'search'])->name('manager.search')->middleware('managerAuth');
 //search in user
 Route::get('/manager/search/user',[ManagerController::class, 'searchUser'])->name('search.user')->middleware('managerAuth');
 //search in medicine
@@ -151,6 +149,8 @@ Route::get('/manager/search/contract',[ManagerController::class, 'searchContract
 Route::get('/manager/search/order',[ManagerController::class, 'searchOrder'])->name('search.order')->middleware('managerAuth');
 //search in supply
 Route::get('/manager/search/supply',[ManagerController::class, 'searchSupply'])->name('search.supply')->middleware('managerAuth');
+//view account table
+Route::get('/manager/table/account',[ManagerController::class,'viewAccount'])->name('manager.tableViewAccount')->middleware('managerAuth');
 
 
 //vendor-----------------------------------

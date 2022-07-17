@@ -16,6 +16,8 @@ use App\Models\contract;
 use App\Models\supply;
 use App\Models\supply_cart;
 use App\Models\orders_cart;
+use App\Models\account;
+use Carbon\Carbon;
 
 class ManagerController extends Controller
 {
@@ -59,6 +61,10 @@ class ManagerController extends Controller
         else if($req->action=='View Query')
         {
             return redirect()->route("manager.tableViewQuery");
+        }
+        else if($req->action=='View Account')
+        {
+            return redirect()->route("manager.tableViewAccount");
         }
         else if($req->action=='Search')
         {
@@ -484,13 +490,10 @@ class ManagerController extends Controller
         }
         $this->validate($req,
         [
-            //'password' => 'same:$pWord',
-            'newPassword' => "required",
+            'newPassword' => "required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
             'confirmPassword' => "required|same:newPassword"
         ],
         [
-            //'password.required' => "Please enter current password!",
-            //'password.same' => "Entered password does not match current password!",
             'newPassword.required' => "Please enter new password!",
             'confirmPassword.required' => "Please confirm new password!",
             'confirmPassword.same' => "The new password does not match!"
@@ -530,8 +533,29 @@ class ManagerController extends Controller
 
     public function queryAcc($id)
     {
+        $quan=orders_cart::where('id',$id)->first();
+        $med=medicine::where('med_id',$quan->med_id)->first();
+        $stock=$quan->quantity+$med->Stock;
         orders_cart::where('id',$id)
         ->update(['return_status'=>'accepted']);
+        medicine::where('med_id',$quan->med_id)
+        ->update(['Stock'=>$stock]);
+        $date=Carbon::today()->toDateString();
+        $rev=account::where('date',$date)->first();
+        $price= $quan->quantity*$med->price_perUnit;
+        if($rev)
+        {
+            $temp= $rev->revenue-$price;
+            account::where('date',$date)
+            ->update(['revenue'=> $temp]);
+        }
+        else
+        {
+            $item= new account();
+            $item->date= Carbon::today()->toDateString();
+            $item->revenue= 0-$price;
+            $item->save();
+        }
         return back();
     }
 
@@ -594,6 +618,14 @@ class ManagerController extends Controller
     {
         $val=supply::where('supply_id',session()->get('searchID'))->paginate(5);
         return view("ManagerView.ViewSupply")->with('data',$val);
+    }
+
+    //view account table
+
+    public function viewAccount()
+    {
+        $val=account::paginate(10);
+        return view("ManagerView.ViewAcc")->with('data',$val);
     }
 
 }

@@ -19,6 +19,10 @@
     </form>
     <br>
     <h4>
+        @error('quantity')
+            {{$message}} <br>
+        @enderror
+        <br>
         @if (count($meds)>0)
             <table border="1">
                 <tr>
@@ -48,9 +52,9 @@
                 @endforeach
             </table>
             <br>
-            @error('quantity')
+            {{-- @error('quantity')
                 {{$message}}
-            @enderror
+            @enderror --}}
             <br>
             <h5>{{$meds->links('pagination::bootstrap-5')}}</h5>
         </h4>

@@ -28,7 +28,7 @@
                 @endif
                 <td> {{$order->order_id}} </td>   
                 <td> {{$order->order_status}} </td>
-                <td> ${{$order->totalbill}} </td>
+                <td> ${{$order->totalbill +$order->delivery_charge}} </td>
                 <td> {{$order->accepted_time}} </td>
                 <td> {{$order->delivery_time}} </td>
                 <td> <a href="{{route('customer.order.details',['order_id'=>$order->order_id])}}">VIEW ITEMS ↓</a></td>

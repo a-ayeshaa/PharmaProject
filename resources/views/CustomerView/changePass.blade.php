@@ -8,6 +8,15 @@
                 <form action="" method="POST">
                     {{ csrf_field() }}
 
+                    @if ($time!=NULL)
+                        Password last updated at {{$time}}
+                        
+                    <br>
+                    <br>
+                    @endif
+                    
+                    
+
                     Email: <input type="email" size="30" name="email" placeholder="{{$customer->customer_email}}" value=" {{$customer->customer_email}} " readonly>
                     <br>
                     @error('email')
