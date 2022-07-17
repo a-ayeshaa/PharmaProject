@@ -24,7 +24,7 @@ class CourierController extends Controller
         }
 
     public function orderView(){
-        $orders=order::all();
+        $orders=order::paginate(5);
         return view ('CourierView.orders')->with('orders',$orders);
     }
 
