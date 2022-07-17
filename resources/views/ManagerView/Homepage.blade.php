@@ -18,7 +18,8 @@
             <input type='submit' name='action' value='View Contracts'> &nbsp; &nbsp;
             <input type='submit' name='action' value='View Supply'> &nbsp; &nbsp;
             <input type='submit' name='action' value='Go to Cart'> &nbsp; &nbsp;<br><br><br><br><br>
-            &nbsp;&nbsp;<input type='submit' name='action' value='View Query'>&nbsp; &nbsp;<br><br>
+            <input type='submit' name='action' value='View Query'>&nbsp;&nbsp; 
+            &nbsp;<input type='submit' name='action' value='View Account'><br><br>
         </form>
     </fieldset>
     </body>

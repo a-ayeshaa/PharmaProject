@@ -62,6 +62,10 @@ class ManagerController extends Controller
         {
             return redirect()->route("manager.tableViewQuery");
         }
+        else if($req->action=='View Account')
+        {
+            return redirect()->route("manager.tableViewAccount");
+        }
         else if($req->action=='Search')
         {
             //return redirect()->route('manager.search');
@@ -614,6 +618,14 @@ class ManagerController extends Controller
     {
         $val=supply::where('supply_id',session()->get('searchID'))->paginate(5);
         return view("ManagerView.ViewSupply")->with('data',$val);
+    }
+
+    //view account table
+
+    public function viewAccount()
+    {
+        $val=account::paginate(10);
+        return view("ManagerView.ViewAcc")->with('data',$val);
     }
 
 }
