@@ -28,8 +28,6 @@
 
     <br><br><br><br>
     <br><br><br><br>
-    <br><br><br><br>
-    <br><br><br><br>
     <a href="{{route('logout')}}">LOGOUT</a>
 
     
