@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\APIAllUserController;
+use App\Http\Controllers\ApiCourierController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,3 +26,7 @@ Route::get('/user/get/{email}',[APIAllUserController::class,'getUser']);
 
 //CREATE USER
 Route::post('/user/create',[APIAllUserController::class,'createUser']);
+
+
+//courier
+Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
