@@ -18,8 +18,18 @@ class APIAllUserController extends Controller
         return response()->json($data);
     }
 
+    //LOGIN
+
     function getUser($email)
     {
+        // $validator = Validator::make($req->all(),[
+        //     "name"=>"required",
+        //     "email"=>"required"
+        // ]);
+        // if ($validator->fails())
+        // {
+        //     return response()->json($validator->errors());
+        // }
         $data = users::where('u_email',$email)->first();
         return response()->json($data);
     }
@@ -27,17 +37,20 @@ class APIAllUserController extends Controller
     //Create User
     function createUser(Request $req)
     {
-        $validator = Validator::make($req->all(),[
-            "name"=>"required",
-            "email"=>"required",    
-            "password"=>"required",
-            "confirmpassword"=>"required"
-        ]);
+        // $validator = Validator::make($req->all(),[
+        //     "name"=>"required",
+        //     // "email"=>"required|unique:users,u_email",    
+        //     "email"=>"required",    
+        //     "password"=>"required",
+        //     // "confirmpassword"=>"required,same:password"
+        //     "confirmpassword"=>"required"
+            
+        // ]);
         
-        if ($validator->fails())
-        {
-            return response()->json($validator->errors());
-        }
+        // if ($validator->fails())
+        // {
+        //     return response()->json($validator->errors(),422);
+        // }
 
         $user= new users();
         $user->u_name = $req->name;
@@ -45,7 +58,6 @@ class APIAllUserController extends Controller
         $user->u_pass =$req->password;
         $user->u_type = $req->type;
         $user->save();
-
         $user=users::where('u_email',$req->email)
                     ->where('u_pass',$req->password)
                     ->first();

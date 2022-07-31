@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //GET USER
-Route::get('/user/get',[APIAllUserController::class,'getUsers']);
+Route::get('/alluser/get',[APIAllUserController::class,'getUsers']);
 Route::get('/user/get/{email}',[APIAllUserController::class,'getUser']);
 
 //CREATE USER
