@@ -6,8 +6,12 @@ use App\Models\users;
 use Illuminate\Http\Request;
 use App\Models\customer;
 use App\Models\manager;
+use App\Models\carts;
 use App\Models\vendor;
 use App\Models\courier;
+use App\Models\Token;
+use DateTime;
+use Illuminate\Support\Str;
 
 class APIAllUserController extends Controller
 {
@@ -19,6 +23,36 @@ class APIAllUserController extends Controller
     }
 
     //LOGIN
+
+    function login(Request $req)
+    {
+        $email=$req->u_email;
+        $password=$req->u_pass;
+        $user=users::where('u_email',$email)
+                    ->where('u_pass',$password)->first();
+
+        if($user!=NULL)
+        {
+            $token=Token::where('u_id',$user->u_id)
+                    ->whereNull('expired_at')->first();
+            if($token!=NULL)
+            {
+                return response()->json($token,200);
+            }
+            $key=Str::random(67);  
+            $token = new Token();
+            $token->token=$key;
+            $token->u_id=$user->u_id;
+            $token->created_at=new DateTime();
+            $token->save();
+            return response()->json($token,200);
+        }
+        else
+        {
+            return response()->json(["msg"=>"Invalid user"],404);
+        }
+        
+    }
 
     function getUser($email)
     {
@@ -32,6 +66,18 @@ class APIAllUserController extends Controller
         // }
         $data = users::where('u_email',$email)->first();
         return response()->json($data);
+    }
+
+    //logout
+    public function logout(Request $req)
+    {
+        $key = $req->token;
+        if($key){
+            $tk = Token::where("token",$key)->first();
+            $tk->expired_at = new Datetime();
+            $tk->save();
+        }
+        return response()->json(["msg"=>"logged out"],200);
     }
 
     //Create User
@@ -99,6 +145,7 @@ class APIAllUserController extends Controller
             $courier->courier_email =$req->email;
             $courier->save();
         }
+        
 
         return response()->json([
             "msg"=>"User created successfully",

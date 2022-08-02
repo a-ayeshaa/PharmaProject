@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\APIAllUserController;
 use App\Http\Controllers\ApiCourierController;
+use App\Http\Controllers\APICustomerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,9 +25,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/alluser/get',[APIAllUserController::class,'getUsers']);
 Route::get('/user/get/{email}',[APIAllUserController::class,'getUser']);
 
+//LOGIN
+Route::post('/login',[APIAllUserController::class,'login']);
+//LOGOUT
+Route::post('/logout',[APIAllUserController::class,'logout']);
+
 //CREATE USER
 Route::post('/user/create',[APIAllUserController::class,'createUser']);
 
 
 //courier
 Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
+
+//CUSTOMER --->AYESHA
+Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");

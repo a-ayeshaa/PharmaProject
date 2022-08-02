@@ -67,7 +67,8 @@ class Kernel extends HttpKernel
         'authvendor' => \App\Http\Middleware\authvendor::class,
         'AuthCustomer' => \App\Http\Middleware\AuthCustomer::class,
         'courierAuth' => \App\Http\Middleware\courierAuth::class,
-        'AuthChangePassword' => \App\Http\Middleware\AuthChangePassword::class
+        'AuthChangePassword' => \App\Http\Middleware\AuthChangePassword::class,
+        'AuthUser' => \App\Http\Middleware\AuthUser::class
         
     ];
 }
