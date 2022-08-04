@@ -24,7 +24,7 @@ class AuthUser
                         ->whereNUll('expired_at')->first();
             if($token)
             {
-                // return response()->json(["msg"=>"logged in"]);
+                return response()->json(["msg"=>"logged in"]);
                 return $next($request);             
             }
             return response()->json(["msg"=>"Expired token"],401);

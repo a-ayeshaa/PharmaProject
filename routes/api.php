@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //GET USER
-Route::get('/alluser/get',[APIAllUserController::class,'getUsers']);
+Route::get('/alluser/get',[APIAllUserController::class,'getUsers'])->middleware("AuthUser");
 Route::get('/user/get/{email}',[APIAllUserController::class,'getUser']);
 
 //LOGIN
