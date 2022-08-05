@@ -39,3 +39,5 @@ Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
 
 //CUSTOMER --->AYESHA
 Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");
+Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middleware("AuthUser");
+Route::get('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUser");
