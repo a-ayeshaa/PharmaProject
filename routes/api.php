@@ -41,3 +41,5 @@ Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
 Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");
 Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middleware("AuthUser");
 Route::post('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUser");
+Route::get('/customer/cart',[APICustomerController::class,'showCart'])->middleware("AuthUser");
+Route::post('/customer/deleteItem',[APICustomerController::class,'deleteItem'])->middleware("AuthUser");

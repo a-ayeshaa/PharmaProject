@@ -39,11 +39,9 @@ class APICustomerController extends Controller
     //ADD TO CART
     function addToCart(Request $req)
     {
-        // return response()->json([$req->med_id,$req->quantity]);
         //find cart_id
         $customer_id=$this->getID($req->header("Authorization"));
         $med=medicine::where('med_id',$req->med_id)->first();
-        // return response()->json($med,200);
         $carts=carts::where('med_id',$req->med_id)->first();
         if ($carts==NULL)
         {
@@ -75,13 +73,33 @@ class APICustomerController extends Controller
         }
 
         medicine::where('med_id',$req->med_id)->update(['Stock'=>$req->Stock-$req->quantity]);
-        // $subtotal=session()->get('subtotal')+$req->quantity*$med->price_perUnit;
-        // session()->put('subtotal',$subtotal);
-
-        // $meds=medicine::paginate(10);
         return response()->json($cart,200);
 
     }
 
-    // function 
+    function showCart()
+    {
+        $cart=carts::all();
+        if (count($cart)>0)
+        {
+            return response()->json($cart,200);         
+        }
+        
+        return response()->json(["msg"=>"EMPTY CART"],404);         
+        
+    }
+
+    function deleteItem(Request $req)
+    {
+        $total=carts::where('item_id',$req->item_id)->first();
+        $info=medicine::where('med_id',$total->med_id)->first();
+        // return $info;
+        medicine::where('med_id',$total->med_id)->update(['Stock'=>$info->Stock+$total->quantity]);
+        carts::where('item_id',$req->item_id)->delete();
+        // $subtotal=session()->get('subtotal')-$total->total;
+        // session()->put('subtotal',$subtotal);
+        return response()->json(["msg"=>"Item removed successfully"],200);
+        
+
+    }
 }
