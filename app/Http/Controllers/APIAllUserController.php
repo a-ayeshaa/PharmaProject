@@ -71,12 +71,12 @@ class APIAllUserController extends Controller
     //logout
     public function logout(Request $req)
     {
-        $key = $req->token;
-        if($key){
-            $tk = Token::where("token",$key)->first();
-            $tk->expired_at = new Datetime();
-            $tk->save();
-        }
+        $key = $req->header("Authorization");
+        // return response()->json($key,200);
+        
+        $tk = Token::where("token",$key)->first();
+        $tk->expired_at = new Datetime();
+        $tk->save();
         return response()->json(["msg"=>"logged out"],200);
     }
 
