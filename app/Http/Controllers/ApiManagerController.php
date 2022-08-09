@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\supply;
+use App\Models\medicine;
+use App\Models\users;
+use App\Models\order;
+use App\Models\supply_cart;
+
+class ApiManagerController extends Controller
+{
+    //homepage
+    function homepage()
+    {
+        return response()->json(200);
+    }
+
+    //view medicine table
+    function viewMed()
+    {
+        $val=medicine::all();
+        return response()->json($val,200);
+    }
+
+    //view user table
+    function viewUser()
+    {
+        $val=users::all();
+        return response()->json($val,200);
+    }
+
+    //view order table
+    function viewOrders()
+    {
+        $val=order::all();
+        return response()->json($val,200);
+    }
+
+    //delete medicine
+    function deleteMed(Request $req)
+    {
+        medicine::where('med_id',$req->m_id)->delete();
+        return response()->json(["msg"=>"Medicine deleted successfully!"],200);
+    }
+
+    //show supply table
+    function showSupply()
+    {
+        $val=supply::all();
+        return response()->json($val,200);
+    }
+
+    //ADD TO CART
+    function addItem(Request $req)
+    {
+        $val=supply::where("supply_id",$req->supply_id)->first();
+        if($req->quantity>$val->stock) //stock check
+        {
+            return response()->json(['msg'=>'Sorry, we are currently low on stock!']);
+        }
+        // $dat=supply_cart::all();
+        // for ($i=0; $i < count($dat); $i++) //checking if item already added
+        // { 
+        //     if($val->med_id==$dat[$i]->med_id)
+        //     {
+        //         $cart=supply_cart::where('med_id',$val->med_id)
+        //         ->update(
+        //             ['quantity'=>$req->quantity+$dat[$i]->quantity,
+        //             'total_price'=>$total+$dat[$i]->total_price]
+        //         );
+        //         return response()->json($cart,200);
+        //     }
+        // }
+        $item = new supply_cart();
+        $item->med_name=$val->med_name;
+        $item->med_id=$val->med_id;
+        $item->vendor_id=$val->vendor_id;
+        $item->price_perUnit=$val->price_perUnit;
+        $item->quantity=$req->quantity;
+        $item->total_price=$req->quantity*$val->price_perUnit;
+        $item->save();
+
+        //supply::where('med_id',$req->med_id)->update(['stock'=>$req->Stock-$req->quantity]);
+        return response()->json($item,200);
+
+    }
+}

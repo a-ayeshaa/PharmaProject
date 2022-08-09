@@ -3,6 +3,7 @@
 use App\Http\Controllers\APIAllUserController;
 use App\Http\Controllers\ApiCourierController;
 use App\Http\Controllers\APICustomerController;
+use App\Http\Controllers\ApiManagerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,3 +50,22 @@ Route::post('/customer/orders',[APICustomerController::class,'showOrders'])->mid
 Route::get('/customer/{order_id}',[APICustomerController::class,'showItems'])->middleware("AuthUser");
 Route::get('/customer/order/cancel/{order_id}',[APICustomerController::class,'cancelOrder'])->middleware("AuthUser");
 Route::post('/customer/item/return',[APICustomerController::class,'returnItems'])->middleware("AuthUser");
+
+
+//MANAGER ---> TONMOY
+//homepage
+Route::get('/manager/home',[ApiManagerController::class,'homepage']);
+//medicine table
+Route::get('/manager/medicine',[ApiManagerController::class,'viewMed']);
+//user table
+Route::get('/manager/user',[ApiManagerController::class,'viewUser']);
+//order table
+Route::get('/manager/orders',[ApiManagerController::class,'viewOrders']);
+//delete medicine
+Route::post('/manager/deleteMed',[ApiManagerController::class,'deleteMed']);
+//supply table
+Route::get('/manager/supply',[ApiManagerController::class,'showSupply']);
+//go to cart
+Route::get('/manager/cart',[ApiManagerController::class,'showSupply']);
+//add item to cart
+Route::post('/manager/addItem',[ApiManagerController::class,'addItem']);
