@@ -6,6 +6,7 @@ use App\Models\carts;
 use App\Models\customer;
 use App\Models\medicine;
 use App\Models\order;
+use App\Models\orders_cart;
 use App\Models\Token;
 use App\Models\users;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class APICustomerController extends Controller
         $info=users::where('u_id',$u_id->u_id)->first();
         if ($info->u_type=='CUSTOMER')
         {
-            $customer_id=customer::where('customer_id',$info->u_id)->first();
+            $customer_id=customer::where('u_id',$info->u_id)->first();
             // return "hello";
             return $customer_id->customer_id;
         }
@@ -77,17 +78,57 @@ class APICustomerController extends Controller
 
     }
 
+    // SHOW CART
     function showCart()
     {
         $cart=carts::all();
+        $total=0;
         if (count($cart)>0)
         {
+            foreach($cart as $item)
+            {
+                $total=$total+$item->total;
+            }
+            // return response()->json(["total"=>$total],200);         
             return response()->json($cart,200);         
         }
         
         return response()->json(["msg"=>"EMPTY CART"],404);         
         
     }
+
+    function getGrandTotal()
+    {
+        $cart=carts::all();
+        $total=0;
+        if (count($cart)>0)
+        {
+            foreach($cart as $item)
+            {
+                $total=$total+$item->total;
+            }
+            // return response()->json(["total"=>$total],200);         
+            return response()->json(["total"=>$total],200);         
+        }
+    }
+
+    //GET GRAND TOTAL
+    function getTotal()
+    {
+        $cart=carts::all();
+        $total=0;
+        if (count($cart)>0)
+        {
+            foreach($cart as $item)
+            {
+                $total=$total+$item->total;
+            }
+            // return response()->json(["total"=>$total],200);         
+            return $total;         
+        }
+    }
+    
+    //REMOVE FROM CART
 
     function deleteItem(Request $req)
     {
@@ -102,4 +143,88 @@ class APICustomerController extends Controller
         
 
     }
+
+    //CONFIRM ORDER
+
+    public function confirmOrder(Request $req)
+    {
+        $info=order::orderBy('cart_id','DESC')->first();
+        $order=new order();
+        $order->customer_id=$this->getID($req->header("Authorization"));
+        $order->totalbill=$this->getTotal()+15;
+        if ($info==NULL)
+        {
+            $order->cart_id=1;
+        }
+        else
+        {
+            $order->cart_id=$info->cart_id+1;
+        }  
+        $order->save();
+
+        $information=order::orderBy('order_id','DESC')->first();
+
+
+        $it=carts::all();
+
+        // return $items;
+        
+        foreach($it as $item)
+        {
+            $add=new orders_cart();
+            $add->order_id=$information->order_id;
+            $add->cart_id=$information->cart_id;
+            $add->items=$item->med_name;
+            $add->quantity=$item->quantity;
+            $add->med_id=$item->med_id;
+            $add->save();
+        }
+        carts::truncate();
+        return response()->json($order,200);
+    }
+
+    //SHOW ORDERS
+
+    function showOrders(Request $req)
+    {
+        $customer_id=$this->getID($req->header("Authorization"));
+        $orders=order::where('customer_id',$customer_id)->orderBy('order_id','DESC')->get();
+        return response()->json($orders,200);
+    }
+
+    // SHOW ITEMS FROM ORDER
+    function showItems($order_id)
+    {
+        $items=orders_cart::where('order_id',$order_id)->get();
+        return response()->json($items,200);
+        
+    }
+
+    //CANCEL ORDER
+
+    function cancelOrder($order_id)
+    {
+        $orders=order::where('order_id',$order_id)->get();
+        foreach ($orders as $order)
+        {
+            foreach($order->orders_cart as $item)
+            {
+                $med=medicine::where('med_id',$item->med_id)->first();
+                medicine::where('med_id',$item->med_id)->update(['Stock'=>$med->Stock+$item->quantity]);   
+            }
+        }
+        order::where('order_id',$order_id)->update(['order_status'=>'Cancelled']);
+        return response()->json(["msg"=>"order cancelled"],200);
+    }
+
+    //RETURN ITEMS
+
+    function returnItems(Request $req)
+    {
+        $customer_id=$this->getID($req->header("Authorization"));
+        $order=order::where('customer_id',$customer_id)
+                    ->where('order_status','delivered')->get();
+        return response()->json($order,200);
+    }
 }
+    

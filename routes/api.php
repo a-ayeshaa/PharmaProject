@@ -43,3 +43,9 @@ Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middle
 Route::post('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUser");
 Route::get('/customer/cart',[APICustomerController::class,'showCart'])->middleware("AuthUser");
 Route::post('/customer/deleteItem',[APICustomerController::class,'deleteItem'])->middleware("AuthUser");
+Route::get('/customer/grandtotal',[APICustomerController::class,'getGrandTotal'])->middleware("AuthUser");
+Route::post('/customer/confirmOrder',[APICustomerController::class,'confirmOrder'])->middleware("AuthUser");
+Route::post('/customer/orders',[APICustomerController::class,'showOrders'])->middleware("AuthUser");
+Route::get('/customer/{order_id}',[APICustomerController::class,'showItems'])->middleware("AuthUser");
+Route::get('/customer/order/cancel/{order_id}',[APICustomerController::class,'cancelOrder'])->middleware("AuthUser");
+Route::post('/customer/item/return',[APICustomerController::class,'returnItems'])->middleware("AuthUser");
