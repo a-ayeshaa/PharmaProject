@@ -35,8 +35,10 @@ Route::post('/logout',[APIAllUserController::class,'logout']);
 Route::post('/user/create',[APIAllUserController::class,'createUser']);
 
 
-//courier
+//courier---Tahmid
 Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
+Route::get('/courier/acceptedOrders',[ApiCourierController::class,'AcceptedOrderView']);
+Route::get('/courier/deliveredOrder',[ApiCourierController::class,'deliveredOrder']);
 
 //CUSTOMER --->AYESHA
 Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");

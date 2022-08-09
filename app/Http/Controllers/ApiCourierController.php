@@ -8,35 +8,48 @@ use App\Models\courier;
 use App\Models\customer;
 use App\Models\order;
 use App\Models\users;
+use App\Models\Token;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use PDO;
 use App\Models\account;
-use Carbon\Carbon;namespace App\Http\Controllers;
+use Carbon\Carbon;
 
 
 class ApiCourierController extends Controller
 {
-    //
-    public function courierHome()
+    public function getID($token)
+    {
+        $u_id=Token::where('token',$token)->first();
+        $info=users::where('u_id',$u_id->u_id)->first();
+        if ($info->u_type=='COURIER')
         {
-            $u_id=session()->get('logged.courier');
-            $courier=courier::where('u_id',$u_id)->first();
-            session()->put('name',$courier->courier_name);
-            return view('CourierView.home')->with('name',$courier->courier_name);
+            $courier_id=courier::where('courier_id',$info->u_id)->first();
+            // return "hello";
+            return $courier_id->courier_id;
         }
-
-    public function orderView(){
-        $orders=order::all();
-        return response()->json($orders);
     }
 
+    public function getUID($token)
+    {
+        $u_id=Token::where('token',$token)->first();
+        return $u_id->u_id;
+    }
+
+    public function orderView(){
+        $data = order::all();
+        return response()->json($data);
+    }
+
+
+    //accepted orders view
     public function AcceptedOrderView(){
         $status="accepted";
         $AcceptedOrders=order::where('order_status',$status)->get();
-        return view ('CourierView.AcceptedOrders')->with('AcceptedOrders',$AcceptedOrders);
+        return response()->json($AcceptedOrders);
     }
 
+    //accepting orders
     public function acceptOrder($order_id){
         $dateNtime=Carbon::now();
         $modified = order::where('order_id',$order_id)
@@ -46,10 +59,11 @@ class ApiCourierController extends Controller
                 'accepted_time'=>$dateNtime
             ]
             );
-        return redirect()->route('courier.mail',['order_id'=>$order_id]);
+        return response()->json("done");
     }
 
-    public function deliveredOrder($order_id){
+    //delivered orders
+    public function deliveredOrder($req,$order_id){
         $dateNtime=Carbon::now();
         $modified = order::where('order_id',$order_id)
         ->update(
@@ -79,7 +93,7 @@ class ApiCourierController extends Controller
         }
 
         //$order=order::where('order_id',$order_id);
-        $u_id=session()->get('logged.courier');
+        $u_id=$this->getUID($req->header("Authorization"));
         $courier=courier::where('u_id',$u_id)->first();
         $modified1=courier::where('u_id',$u_id)
         // ->increment('due_delivery_fee',15);
@@ -88,109 +102,6 @@ class ApiCourierController extends Controller
                 'due_delivery_fee'=>$courier->due_delivery_fee+15
             ]
             );
-        return redirect()->route('courier.AcceptedOrder');
+        return response()->json("done");
     }
-
-    public function sendMail($order_id){
-        $order=order::where('order_id',$order_id)->first();
-        $customer=customer::where('customer_id',$order->customer_id)->first();
-        // Mail::to($customer->customer_email)->send(new orderAccepted($order));
-        Mail::to('tahmidislam73@gmail.com')->send(new orderAccepted($order));
-        return redirect()->route('courier.order');
-    }
-
-    public function courierProfile(){
-        $u_id=session()->get('logged.courier');
-        $courier=courier::where('u_id',$u_id)->first();
-        return view('CourierView.profileView',['id',$u_id])->with('courier',$courier);
-    }
-
-    public function courierProfileEdit(Request $req,$u_id)
-    {
-        $name=$req->name;
-        $u_id=$req->u_id;
-        $this->validate($req,
-        [
-             "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
-             "password"=>"required", //a|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",
-             "confirmPassword"=>"required|same:password",
-             "email"=>"required",
-             //"profilepic"=>"mimes:jpg,png,jpeg"
-        ]);
-////////////////
-
-
-if ($req->hasFile('profilepic'))
-        {
-            $img = session()->get('logged.courier').".jpg";
-            $req->file('profilepic')->storeAs('public/profilepictures/courier/',$img);
-            //
-            users::where('u_id',$u_id)
-                        ->update(
-                            [
-                                'u_name'=>$req->name,
-                                'u_pass'=>$req->password
-                            ]
-                        );
-            courier::where('courier_id',$req->courier_id)
-            ->update(
-                [
-                    'courier_name'=>$req->name,
-                    'img'=>$img
-                ]
-            );
-        }
-        else
-        {
-            users::where('u_id',$u_id)
-            ->update(
-                [
-                'u_name'=>$req->name,
-                'u_pass'=>$req->password
-                ]
-                        );
-            courier::where('courier_id',$req->courier_id)
-            ->update(
-                [
-                    'courier_name'=>$req->name,
-                ]
-            );
-        }
-        
-///////////////
-
-
-        session()->put('name',$name);
-        return redirect()->route('courier.profile',['id'=>$u_id]);
-    }
-
-    public function cashoutView(){
-        $u_id=session()->get('logged.courier');
-        $courier=courier::where('u_id',$u_id)->first();
-        return view('CourierView.cashout',['id',$u_id])->with('courier',$courier);
-    }
-
-    public function cashout(Request $req,$u_id)
-    {
-        $name=$req->name;
-        $u_id=$req->u_id;
-        $availableAmount=$req->availableAmount;
-        $amount=$req->amount;
-        //return $availableAmount;
-        $this->validate($req,
-        [
-            "amount"=> "lte:availableAmount"
-        ]);
-
-        courier::where('courier_id',$req->courier_id)
-        ->update(
-            [
-                'due_delivery_fee'=>$req->availableAmount-$req->amount
-            ]
-        );
-
-        session()->put('name',$name);
-        return redirect()->route('courier.profile',['id'=>$u_id]);
-    }
-
 }
