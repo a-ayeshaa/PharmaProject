@@ -8,6 +8,7 @@ use App\Models\courier;
 use App\Models\customer;
 use App\Models\order;
 use App\Models\users;
+use App\Models\Token;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use PDO;
@@ -17,6 +18,24 @@ use Carbon\Carbon;
 
 class ApiCourierController extends Controller
 {
+    public function getID($token)
+    {
+        $u_id=Token::where('token',$token)->first();
+        $info=users::where('u_id',$u_id->u_id)->first();
+        if ($info->u_type=='COURIER')
+        {
+            $courier_id=courier::where('courier_id',$info->u_id)->first();
+            // return "hello";
+            return $courier_id->courier_id;
+        }
+    }
+
+    public function getUID($token)
+    {
+        $u_id=Token::where('token',$token)->first();
+        return $u_id->u_id;
+    }
+
     public function orderView(){
         $data = order::all();
         return response()->json($data);
@@ -44,7 +63,7 @@ class ApiCourierController extends Controller
     }
 
     //delivered orders
-    public function deliveredOrder($order_id){
+    public function deliveredOrder($req,$order_id){
         $dateNtime=Carbon::now();
         $modified = order::where('order_id',$order_id)
         ->update(
@@ -74,7 +93,7 @@ class ApiCourierController extends Controller
         }
 
         //$order=order::where('order_id',$order_id);
-        $u_id=session()->get('logged.courier');
+        $u_id=$this->getUID($req->header("Authorization"));
         $courier=courier::where('u_id',$u_id)->first();
         $modified1=courier::where('u_id',$u_id)
         // ->increment('due_delivery_fee',15);
