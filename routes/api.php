@@ -39,6 +39,7 @@ Route::post('/user/create',[APIAllUserController::class,'createUser']);
 Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
 Route::get('/courier/acceptedOrders',[ApiCourierController::class,'AcceptedOrderView']);
 Route::get('/courier/deliveredOrder',[ApiCourierController::class,'deliveredOrder']);
+Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name('order.accept')->middleware('courierAuth');
 
 //CUSTOMER --->AYESHA
 Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");
