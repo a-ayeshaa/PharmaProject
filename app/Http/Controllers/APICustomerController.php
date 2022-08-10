@@ -10,6 +10,7 @@ use App\Models\orders_cart;
 use App\Models\Token;
 use App\Models\users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class APICustomerController extends Controller
 {
@@ -40,6 +41,20 @@ class APICustomerController extends Controller
     //ADD TO CART
     function addToCart(Request $req)
     {
+        $validator = Validator::make($req->all(),
+            [
+                'quantity'=> 'required|numeric|max:'.$req->Stock.'|gt:0'
+            ],
+            [
+                'quantity.required'=>'You did not specify the amount!',
+                'quantity.gt'=>'Minimum order quantity must be atleast 1',
+                'quantity.max'=>'The requested amount is not available'
+            ]);
+
+        if ($validator->fails())
+        {
+            return response()->json($validator->errors(),404);
+        }
         //find cart_id
         $customer_id=$this->getID($req->header("Authorization"));
         $med=medicine::where('med_id',$req->med_id)->first();
@@ -221,10 +236,26 @@ class APICustomerController extends Controller
 
     function returnItems(Request $req)
     {
+        $or= array();
         $customer_id=$this->getID($req->header("Authorization"));
         $order=order::where('customer_id',$customer_id)
                     ->where('order_status','delivered')->get();
-        return response()->json($order,200);
+        foreach($order as $o)
+        {
+            foreach($o->orders_cart as $o)
+            {
+                $or[]=$o;
+            }
+            // return $o;
+            
+        }
+        return response()->json($or,200);
+    }
+
+    function return($id)
+    {
+        orders_cart::where('id',$id)->update(['return_status'=>'true']);
+        return response()->json([],200);
     }
 }
     
