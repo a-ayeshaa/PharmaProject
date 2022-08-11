@@ -26,6 +26,14 @@ class APIAllUserController extends Controller
 
     function login(Request $req)
     {
+        $validator = Validator::make($req->all(),[
+            "u_pass"=>"required",
+            "u_email"=>"required"
+        ]);
+        if ($validator->fails())
+        {
+            return response()->json($validator->errors(),404);
+        }
         $email=$req->u_email;
         $password=$req->u_pass;
         $user=users::where('u_email',$email)
@@ -77,26 +85,29 @@ class APIAllUserController extends Controller
         $tk = Token::where("token",$key)->first();
         $tk->expired_at = new Datetime();
         $tk->save();
+        carts::truncate();
         return response()->json(["msg"=>"logged out"],200);
     }
 
     //Create User
     function createUser(Request $req)
     {
-        // $validator = Validator::make($req->all(),[
-        //     "name"=>"required",
-        //     // "email"=>"required|unique:users,u_email",    
-        //     "email"=>"required",    
-        //     "password"=>"required",
-        //     // "confirmpassword"=>"required,same:password"
-        //     "confirmpassword"=>"required"
+        $validator = Validator::make($req->all(),[
+            "email"=>"required|unique:users,u_email",    
+            "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+            "password"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",   
+            "confirmpassword"=>"required|same:password",
+            "type"=>"required"
+            // "confirmpassword"=>"required"
             
-        // ]);
+        ],[
+            "confirmpassword.required"=>"Confirm password is required"
+        ]);
         
-        // if ($validator->fails())
-        // {
-        //     return response()->json($validator->errors(),422);
-        // }
+        if ($validator->fails())
+        {
+            return response()->json($validator->errors(),422);
+        }
 
         $user= new users();
         $user->u_name = $req->name;

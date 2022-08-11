@@ -39,6 +39,7 @@ Route::post('/user/create',[APIAllUserController::class,'createUser']);
 Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
 Route::get('/courier/acceptedOrders',[ApiCourierController::class,'AcceptedOrderView']);
 Route::get('/courier/deliveredOrder',[ApiCourierController::class,'deliveredOrder']);
+Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name('order.accept')->middleware('courierAuth');
 
 //CUSTOMER --->AYESHA
 Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");
@@ -52,6 +53,7 @@ Route::post('/customer/orders',[APICustomerController::class,'showOrders'])->mid
 Route::get('/customer/{order_id}',[APICustomerController::class,'showItems'])->middleware("AuthUser");
 Route::get('/customer/order/cancel/{order_id}',[APICustomerController::class,'cancelOrder'])->middleware("AuthUser");
 Route::post('/customer/item/return',[APICustomerController::class,'returnItems'])->middleware("AuthUser");
+Route::get('/customer/item/return/{id}',[APICustomerController::class,'return'])->middleware("AuthUser");
 
 
 //MANAGER ---> TONMOY
