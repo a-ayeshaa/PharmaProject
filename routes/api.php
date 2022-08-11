@@ -71,3 +71,10 @@ Route::get('/manager/supply',[ApiManagerController::class,'showSupply']);
 Route::get('/manager/cart',[ApiManagerController::class,'showSupply']);
 //add item to cart
 Route::post('/manager/addItem',[ApiManagerController::class,'addItem']);
+//view final cart
+Route::get('/manager/cart/view',[ApiManagerController::class,'finalCart']);
+//view cart
+Route::get('/manager/cart/table',[ApiManagerController::class,'viewCart']);
+//confirm order
+Route::post('/manager/confirm',[ApiManagerController::class,'confirm']);
+
