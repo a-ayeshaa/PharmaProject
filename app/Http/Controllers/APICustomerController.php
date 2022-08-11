@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Validator;
 
 class APICustomerController extends Controller
 {
+    function getInfo(Request $req)
+    {
+        $customer_id=$this->getID($req->header("Authorization"));
+        $data = customer::where('customer_id',$customer_id)->first();
+        return response()->json($data);
+    }
     public function getID($token)
     {
         $u_id=Token::where('token',$token)->first();
@@ -256,6 +262,60 @@ class APICustomerController extends Controller
     {
         orders_cart::where('id',$id)->update(['return_status'=>'true']);
         return response()->json([],200);
+    }
+    
+    //PROFILE UPDATE
+
+    public function customerModify(Request $req)
+    {
+        $customer_id=$this->getID($req->header("Authorization"));
+        $info=Token::where('token',$req->header("Authorization"))->first();
+        $u_id=$info->u_id;
+        $validator = Validator::make($req->all(),
+            [
+                "name"=> "required|regex:/^[A-Za-z- .,]+$/i",
+                "profilepic"=>"mimes:jpg,png,jpeg"
+            ]);
+        if ($validator->fails())
+        {
+            return response()->json($validator->errors(),404);
+        }
+        if ($req->hasFile('profilepic'))
+        {
+            $imgname =$customer_id.".jpg";
+            $req->file('profilepic')->storeAs('public/profilepictures',$imgname);
+            //
+            users::where('u_id',$u_id)
+                        ->update(
+                            [
+                                'u_name'=>$req->name,
+                            ]
+                        );
+            customer::where('customer_id',$customer_id)
+                        ->update(
+                            [
+                                'customer_name'=>$req->name,
+                                'img'=>$imgname
+                            ]
+                        );
+        }
+        else
+        {
+            users::where('u_id',$u_id)
+                        ->update(
+                            [
+                                'u_name'=>$req->name,
+                            ]
+                        );
+            customer::where('customer_id',$customer_id)
+            ->update(
+                [
+                    'customer_name'=>$req->name,
+                ]
+            );
+        }
+        return response()->json(["msg"=>"Profile updated"],200);
+
     }
 }
     

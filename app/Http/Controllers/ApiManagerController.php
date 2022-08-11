@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\contract;
 use Illuminate\Http\Request;
 use App\Models\supply;
 use App\Models\medicine;
@@ -139,6 +140,6 @@ class ApiManagerController extends Controller
 
         //mail::to('faiyazkhondakar@gmail.com')->send(new SupplyOrder("Suppy Order Placement","Hi",session()->get('logged.manager'),$v));
         supply_cart::truncate();
-        return response()-json(["msg"=>"Order Confirmed"],200);
+        return response()->json(["msg"=>"Order Confirmed"],200);
     }
 }

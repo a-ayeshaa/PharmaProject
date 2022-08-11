@@ -43,6 +43,8 @@ Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name
 
 //CUSTOMER --->AYESHA
 Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");
+Route::post('/customer/account',[APICustomerController::class,'getInfo'])->middleware("AuthUser");
+Route::post('/customer/modify/account',[APICustomerController::class,'customerModify'])->middleware("AuthUser");
 Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middleware("AuthUser");
 Route::post('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUser");
 Route::get('/customer/cart',[APICustomerController::class,'showCart'])->middleware("AuthUser");
@@ -79,4 +81,3 @@ Route::get('/manager/cart/view',[ApiManagerController::class,'finalCart']);
 Route::get('/manager/cart/table',[ApiManagerController::class,'viewCart']);
 //confirm order
 Route::post('/manager/confirm',[ApiManagerController::class,'confirm']);
-
