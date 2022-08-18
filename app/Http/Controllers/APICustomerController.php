@@ -268,6 +268,7 @@ class APICustomerController extends Controller
 
     public function customerModify(Request $req)
     {
+        // return response()->json($req);
         $customer_id=$this->getID($req->header("Authorization"));
         $info=Token::where('token',$req->header("Authorization"))->first();
         $u_id=$info->u_id;
@@ -282,7 +283,9 @@ class APICustomerController extends Controller
         }
         if ($req->hasFile('profilepic'))
         {
-            $imgname =$customer_id.".jpg";
+            // return response()->json($req);
+
+            $imgname =$u_id.".jpg";
             $req->file('profilepic')->storeAs('public/profilepictures',$imgname);
             //
             users::where('u_id',$u_id)
