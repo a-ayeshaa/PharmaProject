@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\contract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Models\supply;

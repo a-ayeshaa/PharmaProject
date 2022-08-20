@@ -22,6 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+//ALL USERS ----------
+
 //GET USER
 Route::get('/alluser/get',[APIAllUserController::class,'getUsers'])->middleware("AuthUser");
 Route::get('/user/get/{email}',[APIAllUserController::class,'getUser']);
@@ -34,6 +37,11 @@ Route::post('/logout',[APIAllUserController::class,'logout']);
 //CREATE USER
 Route::post('/user/create',[APIAllUserController::class,'createUser']);
 
+//SEND OTP CODE
+Route::post('/otp',[APIAllUserController::class,'sendOTP']);
+Route::post('/otp/verify',[APIAllUserController::class,'OTPVerify']);
+Route::post('/change/password',[APIAllUserController::class,'ChangePassword']);
+
 
 //courier---Tahmid
 Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
@@ -42,17 +50,19 @@ Route::get('/courier/deliveredOrder',[ApiCourierController::class,'deliveredOrde
 Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name('order.accept')->middleware('courierAuth');
 
 //CUSTOMER --->AYESHA
-Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUser");
-Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middleware("AuthUser");
-Route::post('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUser");
-Route::get('/customer/cart',[APICustomerController::class,'showCart'])->middleware("AuthUser");
-Route::post('/customer/deleteItem',[APICustomerController::class,'deleteItem'])->middleware("AuthUser");
-Route::get('/customer/grandtotal',[APICustomerController::class,'getGrandTotal'])->middleware("AuthUser");
-Route::post('/customer/confirmOrder',[APICustomerController::class,'confirmOrder'])->middleware("AuthUser");
-Route::post('/customer/orders',[APICustomerController::class,'showOrders'])->middleware("AuthUser");
-Route::get('/customer/{order_id}',[APICustomerController::class,'showItems'])->middleware("AuthUser");
-Route::get('/customer/order/cancel/{order_id}',[APICustomerController::class,'cancelOrder'])->middleware("AuthUser");
-Route::post('/customer/item/return',[APICustomerController::class,'returnItems'])->middleware("AuthUser");
+Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUserCustomer");
+Route::post('/customer/account',[APICustomerController::class,'getInfo'])->middleware("AuthUserCustomer");
+Route::post('/customer/modify/account',[APICustomerController::class,'customerModify'])->middleware("AuthUserCustomer");
+Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middleware("AuthUserCustomer");
+Route::post('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUserCustomer");
+Route::get('/customer/cart',[APICustomerController::class,'showCart'])->middleware("AuthUserCustomer");
+Route::post('/customer/deleteItem',[APICustomerController::class,'deleteItem'])->middleware("AuthUserCustomer");
+Route::get('/customer/grandtotal',[APICustomerController::class,'getGrandTotal'])->middleware("AuthUserCustomer");
+Route::post('/customer/confirmOrder',[APICustomerController::class,'confirmOrder'])->middleware("AuthUserCustomer");
+Route::post('/customer/orders',[APICustomerController::class,'showOrders'])->middleware("AuthUserCustomer");
+Route::get('/customer/{order_id}',[APICustomerController::class,'showItems'])->middleware("AuthUserCustomer");
+Route::get('/customer/order/cancel/{order_id}',[APICustomerController::class,'cancelOrder'])->middleware("AuthUserCustomer");
+Route::post('/customer/item/return',[APICustomerController::class,'returnItems'])->middleware("AuthUserCustomer");
 Route::get('/customer/item/return/{id}',[APICustomerController::class,'return'])->middleware("AuthUser");
 
 
@@ -103,12 +113,5 @@ Route::post('/manager/supply/detail',[ApiManagerController::class,'supplyDetail'
 Route::get('/manager/searching',[ApiManagerController::class,'searchView']);
 //search
 Route::post('/manager/search/user',[ApiManagerController::class,'searchUser']);
-
-
-
-
-
-
-
-
+//Route::post('/manager/confirm',[ApiManagerController::class,'confirm']);
 

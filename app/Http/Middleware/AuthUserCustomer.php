@@ -8,7 +8,7 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
-class AuthUser
+class AuthUserCustomer
 {
     /**
      * Handle an incoming request.
@@ -21,9 +21,15 @@ class AuthUser
     {
         $key=$request->header("Authorization");
         
-        if ($key)
+        $url=$request->url();
+        $contains = Str::contains($url, 'customer');
+        // return response()->json($contains,401);
+        
+        if ($key && $contains)
         {
+            
             $token=Token::where('token',$key)
+                        ->where('role',"CUSTOMER")
                         ->whereNUll('expired_at')->first();
             if($token)
             {
