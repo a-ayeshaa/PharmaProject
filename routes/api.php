@@ -63,7 +63,9 @@ Route::post('/customer/orders',[APICustomerController::class,'showOrders'])->mid
 Route::get('/customer/{order_id}',[APICustomerController::class,'showItems'])->middleware("AuthUserCustomer");
 Route::get('/customer/order/cancel/{order_id}',[APICustomerController::class,'cancelOrder'])->middleware("AuthUserCustomer");
 Route::post('/customer/item/return',[APICustomerController::class,'returnItems'])->middleware("AuthUserCustomer");
-Route::get('/customer/item/return/{id}',[APICustomerController::class,'return'])->middleware("AuthUser");
+Route::get('/customer/item/return/{id}',[APICustomerController::class,'return'])->middleware("AuthUserCustomer");
+Route::post('/customer/search',[APICustomerController::class,'search'])->middleware("AuthUserCustomer");
+Route::post('/customer/complain',[APICustomerController::class,'complainEmail'])->middleware("AuthUserCustomer");
 
 
 //MANAGER ---> TONMOY
