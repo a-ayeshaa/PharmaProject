@@ -72,14 +72,6 @@ class APIAllUserController extends Controller
 
     function getUser($email)
     {
-        // $validator = Validator::make($req->all(),[
-        //     "name"=>"required",
-        //     "email"=>"required"
-        // ]);
-        // if ($validator->fails())
-        // {
-        //     return response()->json($validator->errors());
-        // }
         $data = users::where('u_email',$email)->first();
         return response()->json($data);
     }

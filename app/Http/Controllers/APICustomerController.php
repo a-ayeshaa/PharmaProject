@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\sendComplain;
 use App\Models\carts;
 use App\Models\customer;
 use App\Models\medicine;
@@ -10,6 +11,7 @@ use App\Models\orders_cart;
 use App\Models\Token;
 use App\Models\users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class APICustomerController extends Controller
@@ -319,6 +321,35 @@ class APICustomerController extends Controller
         }
         return response()->json(["msg"=>"Profile updated"],200);
 
+    }
+
+    //SEARCH MEDICINE USING NAME
+    function search(Request $req)
+    {
+        if($req->filter=="ORDER BY PRICE HIGHEST TO LOWEST")
+        {
+            $meds=medicine::where('med_name','LIKE','%'.$req->search.'%')->orderBy('price_perUnit','DESC')->get();
+        }
+
+        else if($req->filter=="ORDER BY PRICE LOWEST TO HIGHEST")
+        {
+            $meds=medicine::where('med_name','LIKE','%'.$req->search.'%')->orderBy('price_perUnit','ASC')->get();
+        }
+
+        else
+        {
+            $meds=medicine::where('med_name','LIKE','%'.$req->search.'%')->get();
+        }
+
+        return response()->json($meds,200);
+    }
+
+    // FILE A COMPLAIN
+    function complainEmail(Request $req)
+    {
+        mail::to('ayesha.akhtar.1999@gmail.com')->send(new sendComplain("Complain from Customer#".$req->customer_id,$req->customer_id,
+                                                                               $req->msg));
+        return response()->json(["msg"=>"MAIL SENT SUCCESSFULLY"],200);                                                                        
     }
 }
     
