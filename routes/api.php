@@ -79,4 +79,36 @@ Route::get('/manager/cart/view',[ApiManagerController::class,'finalCart']);
 Route::get('/manager/cart/table',[ApiManagerController::class,'viewCart']);
 //confirm order
 Route::post('/manager/confirm',[ApiManagerController::class,'confirm']);
+//contract table
+Route::get('/manager/contract',[ApiManagerController::class,'showContract']);
+//delete contract
+Route::post('/manager/deleteContract',[ApiManagerController::class,'deleteContract']);
+//query table
+Route::get('/manager/query',[ApiManagerController::class,'showQuery']);
+//accept query
+Route::post('/manager/acceptQuery',[ApiManagerController::class,'acceptQuery']);
+//reject query
+Route::post('/manager/declineQuery',[ApiManagerController::class,'declineQuery']);
+//account table
+Route::get('/manager/account',[ApiManagerController::class,'showAccount']);
+//med details
+Route::post('/manager/med/detail',[ApiManagerController::class,'medDetail']);
+//order details
+Route::post('/manager/orders/detail',[ApiManagerController::class,'ordersDetail']);
+//contract details
+Route::post('/manager/contract/detail',[ApiManagerController::class,'contractDetail']);
+//supply details
+Route::post('/manager/supply/detail',[ApiManagerController::class,'supplyDetail']);
+//search view
+Route::get('/manager/searching',[ApiManagerController::class,'searchView']);
+//search
+Route::post('/manager/search/user',[ApiManagerController::class,'searchUser']);
+
+
+
+
+
+
+
+
 
