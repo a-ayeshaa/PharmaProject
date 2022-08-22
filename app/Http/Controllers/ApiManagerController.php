@@ -222,8 +222,13 @@ class ApiManagerController extends Controller
     //med detail
     function medDetail(Request $req,$id)
     {
-        $val=medicine::where("med_id",$id)->first();
-        return response()->json($val,200);
+        $val=array();
+        $val[]=medicine::where("med_id",$id)->first();
+        if($val[0]!=NULL)
+        {
+            return response()->json($val,200);    
+        }
+        return response()->json(["msg"=>"Medicine does not exist"],404);
     }
 
     //order detail
