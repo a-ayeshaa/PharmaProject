@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmation;
 use App\Mail\sendComplain;
 use App\Models\carts;
 use App\Models\customer;
@@ -171,9 +172,10 @@ class APICustomerController extends Controller
 
     public function confirmOrder(Request $req)
     {
+        $user=customer::where('customer_id',$this->getID($req->header("Authorization")))->first();
         $info=order::orderBy('cart_id','DESC')->first();
         $order=new order();
-        $order->customer_id=$this->getID($req->header("Authorization"));
+        $order->customer_id=$user->customer_id;
         $order->totalbill=$this->getTotal()+15;
         if ($info==NULL)
         {
@@ -203,6 +205,8 @@ class APICustomerController extends Controller
             $add->save();
         }
         carts::truncate();
+        mail::to($user->customer_email)->send(new OrderConfirmation("ORDER CONFIRMATION MAIL",$user->customer_id,
+                                                                               $user->customer_name,$information->cart_id));
         return response()->json($order,200);
     }
 
@@ -350,6 +354,22 @@ class APICustomerController extends Controller
         mail::to('ayesha.akhtar.1999@gmail.com')->send(new sendComplain("Complain from Customer#".$req->customer_id,$req->customer_id,
                                                                                $req->msg));
         return response()->json(["msg"=>"MAIL SENT SUCCESSFULLY"],200);                                                                        
+    }
+
+    function showChart(Request $req)
+    {
+        $customer=$this->getID($req->header("Authorization"));
+        $bill=array();
+        $day=array();
+        $order=order::where("delivery_time","!=",NULL)
+                    ->where("customer_id",$customer)->get();
+        foreach($order as $o)
+        {  
+            $bill[]=$o->totalbill;
+            $day[]=date("j F, Y, g:i a", strtotime($o->delivery_time));
+        }
+        return response()->json(["bill"=>$bill,"day"=>$day],200);
+        
     }
 }
     

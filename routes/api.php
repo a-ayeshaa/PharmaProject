@@ -40,6 +40,7 @@ Route::post('/user/create',[APIAllUserController::class,'createUser']);
 //SEND OTP CODE
 Route::post('/otp',[APIAllUserController::class,'sendOTP']);
 Route::post('/otp/verify',[APIAllUserController::class,'OTPVerify']);
+Route::post('/otp/clear',[APIAllUserController::class,'ClearOTP']);
 Route::post('/change/password',[APIAllUserController::class,'ChangePassword']);
 
 
@@ -54,6 +55,7 @@ Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("
 Route::post('/customer/account',[APICustomerController::class,'getInfo'])->middleware("AuthUserCustomer");
 Route::post('/customer/modify/account',[APICustomerController::class,'customerModify'])->middleware("AuthUserCustomer");
 Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middleware("AuthUserCustomer");
+Route::post('/customer/chart',[APICustomerController::class,'showChart'])->middleware("AuthUserCustomer");
 Route::post('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUserCustomer");
 Route::get('/customer/cart',[APICustomerController::class,'showCart'])->middleware("AuthUserCustomer");
 Route::post('/customer/deleteItem',[APICustomerController::class,'deleteItem'])->middleware("AuthUserCustomer");
@@ -116,4 +118,3 @@ Route::get('/manager/searching',[ApiManagerController::class,'searchView']);
 //search
 Route::post('/manager/search/user',[ApiManagerController::class,'searchUser']);
 //Route::post('/manager/confirm',[ApiManagerController::class,'confirm']);
-
