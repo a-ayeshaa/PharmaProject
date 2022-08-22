@@ -10,7 +10,6 @@ use App\Models\medicine;
 use App\Models\users;
 use App\Models\order;
 use App\Models\supply_cart;
-use App\Models\contract;
 use App\Models\orders_cart;
 use App\Models\account;
 use Carbon\Carbon;
@@ -221,30 +220,30 @@ class ApiManagerController extends Controller
     }
 
     //med detail
-    function medDetail(Request $req)
+    function medDetail(Request $req,$id)
     {
-        $val=medicine::where("med_id",$req->m_id)->first();
+        $val=medicine::where("med_id",$id)->first();
         return response()->json($val,200);
     }
 
     //order detail
-    function ordersDetail(Request $req)
+    function ordersDetail(Request $req,$id)
     {
-        $val=order::where("order_id",$req->o_id)->first();
+        $val=order::where("order_id",$id)->first();
         return response()->json($val,200);
     }
 
     //contract detail
-    function contractDetail(Request $req)
+    function contractDetail(Request $req,$id)
     {
-        $val=contract::where("contract_id",$req->c_id)->first();
+        $val=contract::where("contract_id",$id)->first();
         return response()->json($val,200);
     }
 
     //supply detail
-    function supplyDetail(Request $req)
+    function supplyDetail(Request $req,$id)
     {
-        $val=supply::where("supply_id",$req->s_id)->first();
+        $val=supply::where("supply_id",$id)->first();
         return response()->json($val,200);
     }
 
