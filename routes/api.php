@@ -56,6 +56,8 @@ Route::post('/customer/account',[APICustomerController::class,'getInfo'])->middl
 Route::post('/customer/modify/account',[APICustomerController::class,'customerModify'])->middleware("AuthUserCustomer");
 Route::get('/customer/medlist',[APICustomerController::class,'showMed'])->middleware("AuthUserCustomer");
 Route::post('/customer/chart',[APICustomerController::class,'showChart'])->middleware("AuthUserCustomer");
+Route::post('/customer/chart/monthly',[APICustomerController::class,'showChartMonthly'])->middleware("AuthUserCustomer");
+Route::post('/customer/chart/yearly',[APICustomerController::class,'showChartYearly'])->middleware("AuthUserCustomer");
 Route::post('/customer/add/cart',[APICustomerController::class,'addToCart'])->middleware("AuthUserCustomer");
 Route::get('/customer/cart',[APICustomerController::class,'showCart'])->middleware("AuthUserCustomer");
 Route::post('/customer/deleteItem',[APICustomerController::class,'deleteItem'])->middleware("AuthUserCustomer");
