@@ -125,4 +125,16 @@ Route::post('/manager/user/detail/{id}',[ApiManagerController::class,'userDetail
 Route::post('/manager/deleteUser',[ApiManagerController::class,'deleteUser'])->middleware("ApiManagerAuth");
 //change password
 Route::post('/manager/change/pass',[ApiManagerController::class,'passChange'])->middleware("ApiManagerAuth");
+//get Profile Picture
+Route::post('/manager/propic',[ApiManagerController::class,'getProPic'])->middleware("ApiManagerAuth");
+//change pro pic
+Route::post('/manager/upload/propic',[ApiManagerController::class,'changeProPic'])->middleware("ApiManagerAuth");
+//view profile
+Route::post('/manager/profile/view',[ApiManagerController::class,'viewProfile'])->middleware("ApiManagerAuth");
+//account monthly chart
+Route::get('/manager/monthly',[ApiManagerController::class,'monthlyChart']);
+//account yearly chart
+Route::get('/manager/yearly',[ApiManagerController::class,'yearlyChart'])->middleware("ApiManagerAuth");
+//remove from cart
+Route::post('/manager/remove',[ApiManagerController::class,'removeItem'])->middleware("ApiManagerAuth");
 

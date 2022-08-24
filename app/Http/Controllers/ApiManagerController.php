@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\contract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use App\Models\supply;
 use App\Models\medicine;
 use App\Models\users;
@@ -328,7 +329,7 @@ class ApiManagerController extends Controller
             
             
         ],[
-            "pass.required"=>"",
+            "pass.required"=>"You must enter your current password!",
             "con.required"=>"Confirm password is required",
             "new.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter.",
             "con.same"=>"Sorry the new passowrd does not match!"
@@ -355,5 +356,95 @@ class ApiManagerController extends Controller
         $info=users::where('u_id',$u_id->u_id)->first();
         return $info;
         }
+    }
+
+    //get Pro Pic
+    function getProPic(Request $req)
+    {
+        $val=$this->getID($req->header("Authorization"));
+        return response()->json(['u_id'=>$val->u_id]);
+    }
+
+    //change profile picture
+    function changeProPic(Request $req)
+    {
+        $validator = Validator::make($req->all(),
+            [
+                "profilepic"=>"mimes:jpg,png,jpeg"
+            ]);
+        if ($validator->fails())
+        {
+            return response()->json($validator->errors(),404);
+        }
+        $val=$this->getID($req->header("Authorization"));
+        $img =$val->u_id.".jpg";
+        $req->file('profilepic')->storeAs('public/propics',$img);
+        manager::where('u_id',$val->u_id)
+                ->update(
+                    ['image'=>$img],
+                );
+        return response()->json(["msg"=>"Profile updated"],200);
+    }
+
+    //view profile
+    function viewProfile(Request $req)
+    {
+        $val=$this->getID($req->header("Authorization"));
+        return response()->json($val,200);
+    }
+
+    //monthly account chart
+    function monthlyChart()
+    {
+        $i=account::select(DB::raw("(SUM(revenue)) as sum"),DB::raw("(SUM(expenses)) as sum1"),DB::raw("DATE_FORMAT(date,'%M %Y') as monthname"))
+                ->orderBy('date','ASC')
+                ->groupBy('monthname')
+                ->whereNotNull('date')
+                ->get();
+        $revenue=array();
+        $expense=array();
+        $month=array();
+        foreach($i as $o)
+        {  
+            $revenue[]=$o->sum;
+            $expense[]=$o->sum1;
+            $month[]=$o->monthname;
+        }
+        return response()->json(["bill"=>$revenue,"exp"=>$expense,"month"=>$month],200);
+    }
+
+    //myearly account chart
+    function yearlyChart()
+    {
+        $i=account::select(DB::raw("(SUM(revenue)) as sum"),DB::raw("(SUM(expenses)) as sum1"),DB::raw("YEAR(date) as year"))
+                ->orderBy('date','ASC')
+                ->groupBy('year')
+                ->whereNotNull('date')
+                ->get();
+        $revenue=array();
+        $expense=array();
+        $year=array();
+        foreach($i as $o)
+        {  
+            $revenue[]=$o->sum;
+            $expense[]=$o->sum1;
+            $year[]=$o->year;
+        }
+        return response()->json(["bill"=>$revenue,"exp"=>$expense,"year"=>$year],200);
+    }
+
+    //remove item from cart
+    function removeItem(Request $req)
+    {
+        $val=supply_cart::where('cart_id',$req->c_id)->first();
+        $val2=supply::where('med_id',$val->med_id)->first();
+        $quantity=$val->quantity+$val2->stock;
+        supply::where('med_id',$val->med_id)
+            ->update(
+                ['stock'=>$quantity]
+            );
+        //     return back();
+        supply_cart::where("cart_id",$req->c_id)->delete();
+        return response()->json(["msg"=>"Successfully removed"],200);
     }
 }
