@@ -72,49 +72,55 @@ Route::post('/customer/complain',[APICustomerController::class,'complainEmail'])
 
 //MANAGER ---> TONMOY
 //homepage
-Route::get('/manager/home',[ApiManagerController::class,'homepage']);
+Route::get('/manager/home',[ApiManagerController::class,'homepage'])->middleware("ApiManagerAuth");
 //medicine table
-Route::get('/manager/medicine',[ApiManagerController::class,'viewMed']);
+Route::get('/manager/medicine',[ApiManagerController::class,'viewMed'])->middleware("ApiManagerAuth");
 //user table
-Route::get('/manager/user',[ApiManagerController::class,'viewUser']);
+Route::get('/manager/user',[ApiManagerController::class,'viewUser'])->middleware("ApiManagerAuth");
 //order table
-Route::get('/manager/orders',[ApiManagerController::class,'viewOrders']);
+Route::get('/manager/orders',[ApiManagerController::class,'viewOrders'])->middleware("ApiManagerAuth");
 //delete medicine
-Route::post('/manager/deleteMed',[ApiManagerController::class,'deleteMed']);
+Route::post('/manager/deleteMed',[ApiManagerController::class,'deleteMed'])->middleware("ApiManagerAuth");
 //supply table
-Route::get('/manager/supply',[ApiManagerController::class,'showSupply']);
+Route::get('/manager/supply',[ApiManagerController::class,'showSupply'])->middleware("ApiManagerAuth");
 //go to cart
-Route::get('/manager/cart',[ApiManagerController::class,'showSupply']);
+Route::get('/manager/cart',[ApiManagerController::class,'showSupply'])->middleware("ApiManagerAuth");
 //add item to cart
-Route::post('/manager/addItem',[ApiManagerController::class,'addItem']);
+Route::post('/manager/addItem',[ApiManagerController::class,'addItem'])->middleware("ApiManagerAuth");
 //view final cart
-Route::get('/manager/cart/view',[ApiManagerController::class,'finalCart']);
+Route::get('/manager/cart/view',[ApiManagerController::class,'finalCart'])->middleware("ApiManagerAuth");
 //view cart
-Route::get('/manager/cart/table',[ApiManagerController::class,'viewCart']);
+Route::get('/manager/cart/table',[ApiManagerController::class,'viewCart'])->middleware("ApiManagerAuth");
 //confirm order
-Route::post('/manager/confirm',[ApiManagerController::class,'confirm']);
+Route::post('/manager/confirm',[ApiManagerController::class,'confirm'])->middleware("ApiManagerAuth");
 //contract table
-Route::get('/manager/contract',[ApiManagerController::class,'showContract']);
+Route::get('/manager/contract',[ApiManagerController::class,'showContract'])->middleware("ApiManagerAuth");
 //delete contract
-Route::post('/manager/deleteContract',[ApiManagerController::class,'deleteContract']);
+Route::post('/manager/deleteContract',[ApiManagerController::class,'deleteContract'])->middleware("ApiManagerAuth");
 //query table
-Route::get('/manager/query',[ApiManagerController::class,'showQuery']);
+Route::get('/manager/query',[ApiManagerController::class,'showQuery'])->middleware("ApiManagerAuth");
 //accept query
-Route::post('/manager/acceptQuery',[ApiManagerController::class,'acceptQuery']);
+Route::post('/manager/acceptQuery',[ApiManagerController::class,'acceptQuery'])->middleware("ApiManagerAuth");
 //reject query
-Route::post('/manager/declineQuery',[ApiManagerController::class,'declineQuery']);
+Route::post('/manager/declineQuery',[ApiManagerController::class,'declineQuery'])->middleware("ApiManagerAuth");
 //account table
-Route::get('/manager/account',[ApiManagerController::class,'showAccount']);
+Route::get('/manager/account',[ApiManagerController::class,'showAccount'])->middleware("ApiManagerAuth");
 //med details
-Route::post('/manager/med/detail/{id}',[ApiManagerController::class,'medDetail']);
+Route::post('/manager/med/detail/{id}',[ApiManagerController::class,'medDetail'])->middleware("ApiManagerAuth");
 //order details
-Route::post('/manager/orders/detail/{id}',[ApiManagerController::class,'ordersDetail']);
+Route::post('/manager/orders/detail/{id}',[ApiManagerController::class,'ordersDetail'])->middleware("ApiManagerAuth");
 //contract details
-Route::post('/manager/contract/detail/{id}',[ApiManagerController::class,'contractDetail']);
+Route::post('/manager/contract/detail/{id}',[ApiManagerController::class,'contractDetail'])->middleware("ApiManagerAuth");
 //supply details
-Route::post('/manager/supply/detail/{id}',[ApiManagerController::class,'supplyDetail']);
+Route::post('/manager/supply/detail/{id}',[ApiManagerController::class,'supplyDetail'])->middleware("ApiManagerAuth");
 //search view
-Route::get('/manager/searching',[ApiManagerController::class,'searchView']);
+Route::get('/manager/searching',[ApiManagerController::class,'searchView'])->middleware("ApiManagerAuth");
 //search
-Route::post('/manager/search/user',[ApiManagerController::class,'searchUser']);
-//Route::post('/manager/confirm',[ApiManagerController::class,'confirm']);
+Route::post('/manager/search/user',[ApiManagerController::class,'searchUser'])->middleware("ApiManagerAuth");
+//user detail
+Route::post('/manager/user/detail/{id}',[ApiManagerController::class,'userDetail'])->middleware("ApiManagerAuth");
+//user delete
+Route::post('/manager/deleteUser',[ApiManagerController::class,'deleteUser'])->middleware("ApiManagerAuth");
+//change password
+Route::post('/manager/change/pass',[ApiManagerController::class,'passChange'])->middleware("ApiManagerAuth");
+

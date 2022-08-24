@@ -12,7 +12,12 @@ use App\Models\order;
 use App\Models\supply_cart;
 use App\Models\orders_cart;
 use App\Models\account;
+use App\Models\users_otp;
+use App\Models\Token;
+use App\Models\manager;
+use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use DateTime;
 
 class ApiManagerController extends Controller
 {
@@ -157,15 +162,38 @@ class ApiManagerController extends Controller
     //show contract table
     function showContract()
     {
+        //$val=contract::select("contract_id","vendor_id","contract_status","med_name","price_perUnit")->distinct("contract_id")->get();
         $val=contract::all();
-        return response()->json($val,200);
+        $v=array();
+        for ($i = count($val)-1; $i >=1; $i--)
+        {
+            for ($j = $i-1; $j >= 0; $j--)
+            {
+                if ($val[$i]->contract_id==$val[$j]->contract_id)
+                {
+                    $val[$j]->med_name=$val[$j]->med_name.",".$val[$i]->med_name;
+                    unset($val[$i]);
+                    $i--;
+                }
+            }
+        }
+        foreach($val as $t)
+        {
+            if($t!=null)
+            {
+                $v[]=$t;
+            }
+        }
+        
+        //$val=array_values($val)
+        return response()->json($v,200);
     }
 
     //delete contract
     function deleteContract(Request $req)
     {
         contract::where('contract_id',$req->c_id)->delete();
-        return response()->json(["msg"=>"COntract deleted successfully!"],200);
+        return response()->json(["msg"=>"Contract deleted successfully!"],200);
     }
 
     //shpw query
@@ -222,8 +250,8 @@ class ApiManagerController extends Controller
     //med detail
     function medDetail(Request $req,$id)
     {
-        $val=array();
-        $val[]=medicine::where("med_id",$id)->first();
+        //$val=array();
+        $val=medicine::where("med_id",$id)->get();
         if($val[0]!=NULL)
         {
             return response()->json($val,200);    
@@ -234,28 +262,98 @@ class ApiManagerController extends Controller
     //order detail
     function ordersDetail(Request $req,$id)
     {
-        $val=order::where("order_id",$id)->first();
-        return response()->json($val,200);
+        $val=order::where("order_id",$id)->get();
+        if($val[0]!=NULL)
+        {
+            return response()->json($val,200);    
+        }
+        return response()->json(["msg"=>"Order does not exist"],404);
     }
 
     //contract detail
     function contractDetail(Request $req,$id)
     {
-        $val=contract::where("contract_id",$id)->first();
-        return response()->json($val,200);
+        $val=contract::where("contract_id",$id)->get();
+        if($val[0]!=NULL)
+        {
+            return response()->json($val,200);    
+        }
+        return response()->json(["msg"=>"Contract does not exist"],404);
     }
 
     //supply detail
     function supplyDetail(Request $req,$id)
     {
-        $val=supply::where("supply_id",$id)->first();
-        return response()->json($val,200);
+        $val=supply::where("supply_id",$id)->get();
+        if($val[0]!=NULL)
+        {
+            return response()->json($val,200);    
+        }
+        return response()->json(["msg"=>"Supply does not exist"],404);
     }
 
-    //search user
-    function searchUser()
+    //user detail
+    function userDetail(Request $req,$id)
     {
-        $val=users::where('u_id',session()->get('searchID'))->paginate(5);
-        return response()->json($val,200);
+        $val=users::where("u_id",$id)->get();
+        if($val[0]!=NULL)
+        {
+            return response()->json($val,200);    
+        }
+        return response()->json(["msg"=>"User does not exist"],404);
+    }
+
+    //delete user
+    function deleteUser(Request $req)
+    {
+        users::where('u_id',$req->u_id)->delete();
+        return response()->json(["msg"=>"User deleted successfully!"],200);
+    }
+
+    //sort account by month
+    // function sortMonth()
+    // {
+    //     $val=account::all();
+
+    // }
+
+    //password change
+    function passChange(Request $req)
+    {
+        $val=$this->getID($req->header("Authorization"));
+        $validator = Validator::make($req->all(),[
+            "pass"=>"required",
+            "new"=>"required|min:8|regex:/^.*(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$ %^&*~><.,:;]).*$/i",   
+            "con"=>"required|same:new"
+            
+            
+        ],[
+            "pass.required"=>"",
+            "con.required"=>"Confirm password is required",
+            "new.regex"=>"Password must contain minimum 1 special character and minimum 1 upper case letter.",
+            "con.same"=>"Sorry the new passowrd does not match!"
+        ]);
+        if ($validator->fails())
+        {
+            return response()->json($validator->errors(),404);
+        }
+        if($req->pass==$val->u_pass)
+        {
+            users::where('u_email',$val->u_email)->update(['u_pass'=>$req->new]);
+            return response()->json(["msg"=>"hi"]);
+        }
+        users_otp::where('u_email',$val->u_email)->update(['OTP'=>NULL,'last_changed_at'=>Carbon::now()]);
+        return response()->json(["msg"=>"password changed"],200);
+    }
+
+    //get id of current user
+    public function getID($token)
+    {
+        $u_id=Token::where('token',$token)->first();
+        if($u_id->role=="MANAGER")
+        {
+        $info=users::where('u_id',$u_id->u_id)->first();
+        return $info;
+        }
     }
 }
