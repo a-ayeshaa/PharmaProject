@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmation;
 use App\Mail\sendComplain;
 use App\Models\carts;
 use App\Models\customer;
@@ -11,6 +12,7 @@ use App\Models\orders_cart;
 use App\Models\Token;
 use App\Models\users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -171,9 +173,10 @@ class APICustomerController extends Controller
 
     public function confirmOrder(Request $req)
     {
+        $user=customer::where('customer_id',$this->getID($req->header("Authorization")))->first();
         $info=order::orderBy('cart_id','DESC')->first();
         $order=new order();
-        $order->customer_id=$this->getID($req->header("Authorization"));
+        $order->customer_id=$user->customer_id;
         $order->totalbill=$this->getTotal()+15;
         if ($info==NULL)
         {
@@ -203,6 +206,8 @@ class APICustomerController extends Controller
             $add->save();
         }
         carts::truncate();
+        mail::to($user->customer_email)->send(new OrderConfirmation("ORDER CONFIRMATION MAIL",$user->customer_id,
+                                                                               $user->customer_name,$information->cart_id));
         return response()->json($order,200);
     }
 
@@ -350,6 +355,64 @@ class APICustomerController extends Controller
         mail::to('ayesha.akhtar.1999@gmail.com')->send(new sendComplain("Complain from Customer#".$req->customer_id,$req->customer_id,
                                                                                $req->msg));
         return response()->json(["msg"=>"MAIL SENT SUCCESSFULLY"],200);                                                                        
+    }
+
+    function showChart(Request $req)
+    {
+        $customer=$this->getID($req->header("Authorization"));
+        $bill=array();
+        $day=array();
+        $order=order::where("delivery_time","!=",NULL)
+                    ->orderBy('delivery_time','ASC')
+                    ->where("customer_id",$customer)->get();
+        foreach($order as $o)
+        {  
+            $bill[]=$o->totalbill;
+            $day[]=date("j F, Y, g:i a", strtotime($o->delivery_time));
+        }
+        return response()->json(["bill"=>$bill,"day"=>$day],200);
+        
+    }
+
+
+    function showChartMonthly(Request $req)
+    {
+        // $info=order::where("order_status","delivered")->sum("totalbill");
+        $i=order::select(DB::raw("(SUM(totalbill)) as sum"),DB::raw("DATE_FORMAT(delivery_time,'%M %Y') as monthname"))
+                ->orderBy('delivery_time','ASC')
+                ->groupBy('monthname')
+                ->whereNotNull('delivery_time')
+                ->get();
+        $bill=array();
+        $month=array();
+        foreach($i as $o)
+        {  
+            $bill[]=$o->sum;
+            $month[]=$o->monthname;
+        }
+        return response()->json(["bill"=>$bill,"month"=>$month],200);
+        
+    }
+
+    function showChartYearly(Request $req)
+    {
+        // $info=order::where("order_status","delivered")->sum("totalbill");
+        $i=order::select(DB::raw("(SUM(totalbill)) as sum"),DB::raw("YEAR(delivery_time) as year"))
+                ->whereNotNull('delivery_time')
+                ->orderBy('delivery_time','ASC')
+                ->groupBy('year')
+                ->get();
+        $bill=array();
+        $year=array();
+        foreach($i as $o)
+        {  
+            $bill[]=$o->sum;
+            $year[]=$o->year;
+        }
+        // return response()->json($i,200);
+
+        return response()->json(["bill"=>$bill,"year"=>$year],200);
+        
     }
 }
     

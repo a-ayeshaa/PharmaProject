@@ -240,6 +240,13 @@ class APIAllUserController extends Controller
         users::where('u_email',$req->email)->update(['u_pass'=>$req->password]);
         users_otp::where('u_email',$req->email)->update(['OTP'=>NULL,'last_changed_at'=>Carbon::now()]);
         return response()->json(["msg"=>"password changed"],200);
-        
+         
+    }
+
+    function clearOTP(Request $req)
+    {
+        $bool=users_otp::where('u_email',$req->email)->update(['OTP'=>NULL]);
+        // return response()->json($bool,200);
+        return response()->json(["msg"=>"OTP has been cleared"],200);
     }
 }
