@@ -72,10 +72,21 @@ class ApiManagerController extends Controller
     //ADD TO CART
     function addItem(Request $req)
     {
+        $validator = Validator::make($req->all(),
+        [
+            'quantity' => 'gt:0'
+        ],
+        [
+            'quantity.gt' => 'Quantity must be atleast 1'
+        ]);
+        if ($validator->fails())
+        {
+            return response()->json($validator->errors(),404);
+        }
         $val=supply::where("supply_id",$req->supply_id)->first();
         if($req->quantity>$val->stock) //stock check
         {
-            return response()->json(['msg'=>'Sorry, we are currently low on stock!']);
+            return response()->json(['msg'=>'Sorry, we are currently low on stock!'],422);
         }
         $total=$req->quantity*$val->price_perUnit;
         $dat=supply_cart::all();
