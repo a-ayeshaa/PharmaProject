@@ -6,6 +6,7 @@ use App\Http\Controllers\APICustomerController;
 use App\Http\Controllers\ApiManagerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Spatie\FlareClient\Api;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,8 +48,12 @@ Route::post('/change/password',[APIAllUserController::class,'ChangePassword']);
 //courier---Tahmid
 Route::get('/courier/orders',[ApiCourierController::class,'orderView']);
 Route::get('/courier/acceptedOrders',[ApiCourierController::class,'AcceptedOrderView']);
-Route::get('/courier/deliveredOrder',[ApiCourierController::class,'deliveredOrder']);
-Route::get('/courier/{order_id}',[CourierController::class,'acceptOrder'])->name('order.accept')->middleware('courierAuth');
+Route::get('/courier/deliveredOrder/{order_id}',[ApiCourierController::class,'deliveredOrder']);
+Route::get('/courier/{order_id}',[ApiCourierController::class,'acceptOrder']);
+Route::post('/courier/profile',[ApiCourierController::class,'getProfile']);
+Route::post('/courier/modify/profile',[ApiCourierController::class,'courierProfileEdit']);
+Route::post('/courier/cashout',[ApiCourierController::class,'cashout']);
+Route::post('/courier/cashoutView',[ApiCourierController::class,'cashoutView']);
 
 //CUSTOMER --->AYESHA
 Route::get('/customer/home',[APICustomerController::class,'home'])->middleware("AuthUserCustomer");
