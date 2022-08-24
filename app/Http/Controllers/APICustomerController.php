@@ -12,6 +12,7 @@ use App\Models\orders_cart;
 use App\Models\Token;
 use App\Models\users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -362,6 +363,7 @@ class APICustomerController extends Controller
         $bill=array();
         $day=array();
         $order=order::where("delivery_time","!=",NULL)
+                    ->orderBy('delivery_time','ASC')
                     ->where("customer_id",$customer)->get();
         foreach($order as $o)
         {  
@@ -369,6 +371,47 @@ class APICustomerController extends Controller
             $day[]=date("j F, Y, g:i a", strtotime($o->delivery_time));
         }
         return response()->json(["bill"=>$bill,"day"=>$day],200);
+        
+    }
+
+
+    function showChartMonthly(Request $req)
+    {
+        // $info=order::where("order_status","delivered")->sum("totalbill");
+        $i=order::select(DB::raw("(SUM(totalbill)) as sum"),DB::raw("DATE_FORMAT(delivery_time,'%M %Y') as monthname"))
+                ->orderBy('delivery_time','ASC')
+                ->groupBy('monthname')
+                ->whereNotNull('delivery_time')
+                ->get();
+        $bill=array();
+        $month=array();
+        foreach($i as $o)
+        {  
+            $bill[]=$o->sum;
+            $month[]=$o->monthname;
+        }
+        return response()->json(["bill"=>$bill,"month"=>$month],200);
+        
+    }
+
+    function showChartYearly(Request $req)
+    {
+        // $info=order::where("order_status","delivered")->sum("totalbill");
+        $i=order::select(DB::raw("(SUM(totalbill)) as sum"),DB::raw("YEAR(delivery_time) as year"))
+                ->whereNotNull('delivery_time')
+                ->orderBy('delivery_time','ASC')
+                ->groupBy('year')
+                ->get();
+        $bill=array();
+        $year=array();
+        foreach($i as $o)
+        {  
+            $bill[]=$o->sum;
+            $year[]=$o->year;
+        }
+        // return response()->json($i,200);
+
+        return response()->json(["bill"=>$bill,"year"=>$year],200);
         
     }
 }
